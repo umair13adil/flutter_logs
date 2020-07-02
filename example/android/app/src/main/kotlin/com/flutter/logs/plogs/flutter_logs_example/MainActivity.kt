@@ -44,9 +44,6 @@ class MainActivity : FlutterActivity() {
         messenger?.let {
             channel = MethodChannel(messenger, "flutter_logs")
             channel?.setMethodCallHandler { call, result ->
-
-                requestStoragePermission()
-
                 when (call.method) {
                     "initLogs" -> {
 
