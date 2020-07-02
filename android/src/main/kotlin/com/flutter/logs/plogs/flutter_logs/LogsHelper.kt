@@ -42,6 +42,8 @@ object LogsHelper {
                     singleLogFileSize: Int?,
                     enabled: Boolean?) {
 
+        createDir(savePath + File.separator + "Logs")
+
         val config = LogsConfig(
                 logLevelsEnabled = logLevelsEnabled,
                 logTypesEnabled = logTypesEnabled,
@@ -169,7 +171,6 @@ object LogsHelper {
         val file = File(Environment.getExternalStorageDirectory().toString() + File.separator + pathName)
         return if (!file.exists()) {
             val result = file.mkdirs()
-            Log.i(TAG, "Path: ${file.path}, Result: $result")
             file.path
         } else file.path
     }
