@@ -46,11 +46,11 @@ fun getIntValueById(key: String, call: MethodCall): Int? {
     return null
 }
 
-fun getBoolValueById(key: String, call: MethodCall): Boolean? {
+fun getBoolValueById(key: String, call: MethodCall): Boolean {
     call.argument<Boolean>(key)?.let {
         return it
     }
-    return null
+    return false
 }
 
 fun getInputStreamValueById(key: String, call: MethodCall): InputStream? {

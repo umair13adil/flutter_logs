@@ -90,13 +90,19 @@ class FlutterLogs {
       {String topic = "",
       String brokerUrl = "",
       String certificate = "",
-      String clientId = ""}) async {
+      String clientId = "",
+      String port = "",
+      int qos = 0,
+      bool retained = false}) async {
     final ByteData bytes = await rootBundle.load('assets/$certificate');
     return await channel.invokeMethod('initMQTT', <String, dynamic>{
       'topic': topic,
       'brokerUrl': brokerUrl,
       'certificate': bytes.buffer.asUint8List(),
-      'clientId': clientId
+      'clientId': clientId,
+      'port': port,
+      'qos': qos,
+      'retained': retained
     });
   }
 

@@ -4,12 +4,12 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.util.Log
+import android.widget.Toast
 import androidx.annotation.NonNull
 import androidx.core.content.ContextCompat
 import com.blackbox.plog.pLogs.PLog
-import com.blackbox.plog.pLogs.impl.PLogImpl
+import com.blackbox.plog.pLogs.exporter.ExportType
 import com.blackbox.plog.pLogs.models.LogLevel
 import com.blackbox.plog.pLogs.models.LogType
 import io.flutter.embedding.android.FlutterActivity
@@ -18,8 +18,10 @@ import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugins.GeneratedPluginRegistrant
-import java.io.File
-import java.lang.Exception
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.schedulers.Schedulers
+import java.util.concurrent.TimeUnit
 
 class MainActivity : FlutterActivity() {
 
@@ -105,13 +107,19 @@ class MainActivity : FlutterActivity() {
                         val brokerUrl = getStringValueById("brokerUrl", call)
                         val certificate = getInputStreamValueById("certificate", call)
                         val clientId = getStringValueById("clientId", call)
+                        val port = getStringValueById("port", call)
+                        val qos = getIntValueById("qos", call)
+                        val retained = getBoolValueById("retained", call)
 
                         LogsHelper.setMQTT(this,
                                 writeLogsToLocalStorage = true,
                                 topic = topic,
                                 brokerUrl = brokerUrl,
                                 certificateInputStream = certificate,
-                                clientId = clientId)
+                                clientId = clientId,
+                                port = port,
+                                qos = qos,
+                                retained = retained)
 
                         result.success("MQTT setup added.")
                     }
@@ -189,10 +197,85 @@ class MainActivity : FlutterActivity() {
                             }
                         }
                     }
+                    "logToFile" -> {
+                        val logFileName = getStringValueById("logFileName", call)
+                        val overwrite = getBoolValueById("overwrite", call)
+                        val logMessage = getStringValueById("logMessage", call)
+                        val appendTimeStamp = getBoolValueById("appendTimeStamp", call)
+
+                        if (overwrite) {
+                            LogsHelper.overWriteLogToFile(logFileName, logMessage, appendTimeStamp)
+                        } else {
+                            LogsHelper.writeLogToFile(logFileName, logMessage, appendTimeStamp)
+                        }
+                    }
                     "exportLogs" -> {
-                        eventSink?.endOfStream()
-                        eventSink = null
-                        result.success("Logs exported.")
+                        PLog.exportLogsForType(ExportType.TODAY, exportDecrypted = true)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .debounce(500, TimeUnit.MILLISECONDS)
+                                .subscribeBy(
+                                        onNext = {
+                                            PLog.logThis(TAG, "exportPLogs", "PLogs Path: $it", LogLevel.INFO)
+
+                                            channel?.invokeMethod("logsExported", "Exported to: $it")
+                                        },
+                                        onError = {
+                                            it.printStackTrace()
+                                            PLog.logThis(TAG, "exportPLogs", "PLog Error: " + it.message, LogLevel.ERROR)
+                                        },
+                                        onComplete = { }
+                                )
+                    }
+                    "exportFileLogs" -> {
+                        PLog.exportDataLogsForName("", exportDecrypted = true)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .debounce(500, TimeUnit.MILLISECONDS)
+                                .subscribeBy(
+                                        onNext = {
+                                            PLog.logThis(TAG, "exportDataLogs", "DataLog Path: $it", LogLevel.INFO)
+
+                                            runOnUiThread {
+                                                Toast.makeText(this@MainActivity, "Exported to: $it", Toast.LENGTH_SHORT).show()
+                                            }
+                                        },
+                                        onError = {
+                                            it.printStackTrace()
+                                            PLog.logThis(TAG, "exportDataLogs", "DataLogger Error: " + it.message, LogLevel.ERROR)
+                                        },
+                                        onComplete = { }
+                                )
+                    }
+                    "printLogs" -> {
+                        PLog.printLogsForType(ExportType.TODAY, printDecrypted = true)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribeBy(
+                                        onNext = {
+                                            Log.i("PLog", it)
+                                        },
+                                        onError = {
+                                            it.printStackTrace()
+                                            PLog.logThis(TAG, "printLogs", "PLog Error: " + it.message, LogLevel.ERROR)
+                                        },
+                                        onComplete = { }
+                                )
+                    }
+                    "printDataLogs" -> {
+                        PLog.printDataLogsForName(LogType.Location.type, printDecrypted = true)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribeBy(
+                                        onNext = {
+                                            Log.i("DataLog", it)
+                                        },
+                                        onError = {
+                                            it.printStackTrace()
+                                            PLog.logThis(TAG, "printLogs", "DataLogger Error: " + it.message, LogLevel.ERROR)
+                                        },
+                                        onComplete = { }
+                                )
                     }
                     else -> result.notImplemented()
                 }
@@ -214,22 +297,26 @@ class MainActivity : FlutterActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        requestStoragePermission()
-
         flutterEngine?.let {
             mFlutterEngine = flutterEngine
 
             it.dartExecutor.binaryMessenger.let { messenger ->
                 binaryMessenger = messenger
                 registerWith(messenger)
+
+                //Request Permissions
+                requestStoragePermission()
             }
         }
     }
 
+    private fun areStoragePermissionsGranted(): Boolean {
+        return ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+    }
 
     private fun requestStoragePermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
-                && ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+        if (!areStoragePermissionsGranted()) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE), REQUEST_STORAGE_PERMISSIONS)
             } else {

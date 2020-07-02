@@ -42,6 +42,8 @@ class _MyAppState extends State<MyApp> {
               RaisedButton(
                 onPressed: () async {
                   setUpLogs();
+                  doSetupForELKSchema();
+                  doSetupForMQTT();
                 },
                 child: Text('Setup Logs', style: TextStyle(fontSize: 20)),
               ),
@@ -64,6 +66,8 @@ class _MyAppState extends State<MyApp> {
         if (call.method == 'storagePermissionsGranted') {
           print("setUpLogsIfPermissionsGranted: storagePermissionsGranted");
           setUpLogs();
+          doSetupForELKSchema();
+          doSetupForMQTT();
         }
       });
     }
@@ -89,6 +93,47 @@ class _MyAppState extends State<MyApp> {
           isDebuggable: true);
     } on PlatformException {
       print("initState: PlatformException");
+    }
+  }
+
+  void doSetupForELKSchema() async {
+    try {
+      await FlutterLogs.setMetaInfo(
+        appId: "flutter_logs_example",
+        appName: "Flutter Logs Demo",
+        appVersion: "1.0",
+        language: "en-US",
+        deviceId: "00012",
+        environmentId: "7865",
+        environmentName: "dev",
+        organizationId: "5767",
+        userId: "883023-2832-2323",
+        userName: "umair13adil",
+        userEmail: "m.umair.adil@gmail.com",
+        deviceSerial: "YJBKKSNKDNK676",
+        deviceBrand: "LG",
+        deviceName: "LG-Y08",
+        deviceManufacturer: "LG",
+        deviceModel: "989892BBN",
+        deviceSdkInt: "26",
+        latitude: "0.0",
+        longitude: "0.0",
+        labels: "",
+      );
+    } on PlatformException {
+      print("doSetupForELKSchema: PlatformException");
+    }
+  }
+
+  void doSetupForMQTT() async {
+    try {
+      await FlutterLogs.initMQTT(
+          topic: "YOUR_TOPIC",
+          brokerUrl: "YOUR_URL",
+          certificate: "m2mqtt_ca.crt",
+          port: "8883");
+    } on PlatformException {
+      print("doSetupForMQTT: PlatformException");
     }
   }
 

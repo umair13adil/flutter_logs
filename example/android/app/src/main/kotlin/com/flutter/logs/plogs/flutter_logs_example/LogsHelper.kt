@@ -102,18 +102,27 @@ object LogsHelper {
         ) == PackageManager.PERMISSION_GRANTED)
     }
 
-    fun writeLogToFile(type: LogType, data: String?) {
+    fun writeLogToFile(type: String, data: String?, appendTimeStamp: Boolean) {
         try {
-            PLog.getLoggerFor(type.type)
-                    ?.appendToFile("$data [${DateTimeUtils.getTimeFormatted()}]")
+            if (appendTimeStamp) {
+                PLog.getLoggerFor(type)
+                        ?.appendToFile("$data [${DateTimeUtils.getTimeFormatted()}]")
+            } else {
+                PLog.getLoggerFor(type)
+                        ?.appendToFile("$data")
+            }
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
-    fun overWriteLogToFile(type: LogType, data: String?) {
+    fun overWriteLogToFile(type: String, data: String?, appendTimeStamp: Boolean) {
         try {
-            PLog.getLoggerFor(type.type)?.overwriteToFile(data!!)
+            if (appendTimeStamp) {
+                PLog.getLoggerFor(type)?.overwriteToFile("$data [${DateTimeUtils.getTimeFormatted()}]")
+            } else {
+                PLog.getLoggerFor(type)?.overwriteToFile(data!!)
+            }
         } catch (e: java.lang.Exception) {
             e.printStackTrace()
         }
@@ -167,14 +176,21 @@ object LogsHelper {
             topic: String?,
             brokerUrl: String?,
             certificateInputStream: InputStream?,
-            clientId: String?
+            clientId: String?,
+            port: String?,
+            qos: Int?,
+            retained: Boolean?
+
     ) {
         PLogMQTTProvider.initMQTTClient(context,
                 writeLogsToLocalStorage = writeLogsToLocalStorage ?: true,
                 topic = topic ?: "",
                 brokerUrl = brokerUrl ?: "",
                 certificateStream = certificateInputStream,
-                clientId = clientId ?: ""
+                clientId = clientId ?: "",
+                port = port ?: "",
+                qos = qos ?: 0,
+                retained = retained ?: false
         )
     }
 
