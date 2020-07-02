@@ -5,13 +5,10 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import androidx.annotation.NonNull
 import androidx.core.content.ContextCompat
 import com.blackbox.plog.pLogs.PLog
-import com.blackbox.plog.pLogs.exporter.ExportType
 import com.blackbox.plog.pLogs.models.LogLevel
-import com.blackbox.plog.pLogs.models.LogType
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.BinaryMessenger
@@ -21,11 +18,10 @@ import io.flutter.plugins.GeneratedPluginRegistrant
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
-import java.util.concurrent.TimeUnit
 
 class MainActivity : FlutterActivity() {
 
-    private val TAG = "MainActivity"
+    private val TAG = "FlutterLogs"
     private val REQUEST_STORAGE_PERMISSIONS = 1324
 
     override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
@@ -48,6 +44,9 @@ class MainActivity : FlutterActivity() {
         messenger?.let {
             channel = MethodChannel(messenger, "flutter_logs")
             channel?.setMethodCallHandler { call, result ->
+
+                requestStoragePermission()
+
                 when (call.method) {
                     "initLogs" -> {
 
@@ -210,10 +209,12 @@ class MainActivity : FlutterActivity() {
                         }
                     }
                     "exportLogs" -> {
-                        PLog.exportLogsForType(ExportType.TODAY, exportDecrypted = true)
+                        val exportType = getStringValueById("exportType", call)
+                        val decryptBeforeExporting = getBoolValueById("decryptBeforeExporting", call)
+
+                        PLog.exportLogsForType(getExportType(exportType), exportDecrypted = decryptBeforeExporting)
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
-                                .debounce(500, TimeUnit.MILLISECONDS)
                                 .subscribeBy(
                                         onNext = {
                                             PLog.logThis(TAG, "exportPLogs", "PLogs Path: $it", LogLevel.INFO)
@@ -223,56 +224,90 @@ class MainActivity : FlutterActivity() {
                                         onError = {
                                             it.printStackTrace()
                                             PLog.logThis(TAG, "exportPLogs", "PLog Error: " + it.message, LogLevel.ERROR)
+                                            channel?.invokeMethod("logsExported", it.message)
                                         },
                                         onComplete = { }
                                 )
                     }
-                    "exportFileLogs" -> {
-                        PLog.exportDataLogsForName("", exportDecrypted = true)
+                    "exportFileLogForName" -> {
+                        val logFileName = getStringValueById("logFileName", call)
+                        val decryptBeforeExporting = getBoolValueById("decryptBeforeExporting", call)
+
+                        PLog.exportDataLogsForName(logFileName, exportDecrypted = decryptBeforeExporting)
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
-                                .debounce(500, TimeUnit.MILLISECONDS)
                                 .subscribeBy(
                                         onNext = {
-                                            PLog.logThis(TAG, "exportDataLogs", "DataLog Path: $it", LogLevel.INFO)
+                                            PLog.logThis(TAG, "exportFileLogForName", "DataLog Path: $it", LogLevel.INFO)
 
-                                            runOnUiThread {
-                                                Toast.makeText(this@MainActivity, "Exported to: $it", Toast.LENGTH_SHORT).show()
-                                            }
+                                            channel?.invokeMethod("logsExported", "Exported File Logs to: $it")
                                         },
                                         onError = {
                                             it.printStackTrace()
-                                            PLog.logThis(TAG, "exportDataLogs", "DataLogger Error: " + it.message, LogLevel.ERROR)
+                                            PLog.logThis(TAG, "exportFileLogForName", "DataLogger Error: " + it.message, LogLevel.ERROR)
+                                            channel?.invokeMethod("logsExported", it.message)
+                                        },
+                                        onComplete = { }
+                                )
+                    }
+                    "exportAllFileLogs" -> {
+                        val decryptBeforeExporting = getBoolValueById("decryptBeforeExporting", call)
+
+                        PLog.exportAllDataLogs(exportDecrypted = decryptBeforeExporting)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribeBy(
+                                        onNext = {
+                                            PLog.logThis(TAG, "exportAllFileLogs", "DataLog Path: $it", LogLevel.INFO)
+
+                                            channel?.invokeMethod("logsExported", "Exported File Logs to: $it")
+                                        },
+                                        onError = {
+                                            it.printStackTrace()
+                                            PLog.logThis(TAG, "exportAllFileLogs", "DataLogger Error: " + it.message, LogLevel.ERROR)
+                                            channel?.invokeMethod("logsExported", it.message)
                                         },
                                         onComplete = { }
                                 )
                     }
                     "printLogs" -> {
-                        PLog.printLogsForType(ExportType.TODAY, printDecrypted = true)
+                        val exportType = getStringValueById("exportType", call)
+                        val decryptBeforeExporting = getBoolValueById("decryptBeforeExporting", call)
+
+                        PLog.printLogsForType(getExportType(exportType), printDecrypted = decryptBeforeExporting)
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribeBy(
                                         onNext = {
-                                            Log.i("PLog", it)
+                                            Log.i("printLogs", it)
+
+                                            channel?.invokeMethod("logsExported", it)
                                         },
                                         onError = {
                                             it.printStackTrace()
                                             PLog.logThis(TAG, "printLogs", "PLog Error: " + it.message, LogLevel.ERROR)
+                                            channel?.invokeMethod("logsExported", it.message)
                                         },
                                         onComplete = { }
                                 )
                     }
-                    "printDataLogs" -> {
-                        PLog.printDataLogsForName(LogType.Location.type, printDecrypted = true)
+                    "printFileLogForName" -> {
+                        val logFileName = getStringValueById("logFileName", call)
+                        val decryptBeforeExporting = getBoolValueById("decryptBeforeExporting", call)
+
+                        PLog.printDataLogsForName(logFileName, printDecrypted = decryptBeforeExporting)
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribeBy(
                                         onNext = {
-                                            Log.i("DataLog", it)
+                                            Log.i("printFileLogForName", it)
+
+                                            channel?.invokeMethod("logsExported", it)
                                         },
                                         onError = {
                                             it.printStackTrace()
-                                            PLog.logThis(TAG, "printLogs", "DataLogger Error: " + it.message, LogLevel.ERROR)
+                                            PLog.logThis(TAG, "printFileLogForName", "DataLogger Error: " + it.message, LogLevel.ERROR)
+                                            channel?.invokeMethod("logsExported", it.message)
                                         },
                                         onComplete = { }
                                 )
@@ -291,6 +326,9 @@ class MainActivity : FlutterActivity() {
 
                 }
             })
+
+            //Request Permissions
+            requestStoragePermission()
         }
     }
 
@@ -303,9 +341,6 @@ class MainActivity : FlutterActivity() {
             it.dartExecutor.binaryMessenger.let { messenger ->
                 binaryMessenger = messenger
                 registerWith(messenger)
-
-                //Request Permissions
-                requestStoragePermission()
             }
         }
     }
@@ -335,7 +370,9 @@ class MainActivity : FlutterActivity() {
     }
 
     private fun doIfPermissionsGranted() {
-        Log.i(TAG, "doIfPermissionsGranted: Send event.")
-        channel?.invokeMethod("storagePermissionsGranted", "")
+        channel?.let{
+            Log.i(TAG, "doIfPermissionsGranted: Send event.")
+            it.invokeMethod("storagePermissionsGranted", "")
+        }
     }
 }

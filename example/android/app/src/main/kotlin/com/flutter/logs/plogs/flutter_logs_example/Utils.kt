@@ -1,6 +1,7 @@
 package com.flutter.logs.plogs.flutter_logs_example
 
 import android.util.Log
+import com.blackbox.plog.pLogs.exporter.ExportType
 import com.blackbox.plog.pLogs.formatter.TimeStampFormat
 import com.blackbox.plog.pLogs.models.LogExtension
 import com.blackbox.plog.pLogs.models.LogLevel
@@ -110,6 +111,27 @@ fun getLogLevel(type: String?): LogLevel {
         }
     }
     return LogLevel.INFO
+}
+
+fun getExportType(type: String?): ExportType {
+    when (type) {
+        "TODAY" -> {
+            return ExportType.TODAY
+        }
+        "LAST_HOUR" -> {
+            return ExportType.LAST_HOUR
+        }
+        "WEEKS" -> {
+            return ExportType.WEEKS
+        }
+        "LAST_24_HOURS" -> {
+            return ExportType.LAST_24_HOURS
+        }
+        "ALL" -> {
+            return ExportType.ALL
+        }
+    }
+    return ExportType.ALL
 }
 
 fun getTimeStampFormat(type: String?): String {

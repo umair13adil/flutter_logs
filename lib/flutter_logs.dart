@@ -26,6 +26,7 @@ enum TimeStampFormat {
   TIME_FORMAT_READABLE,
   TIME_FORMAT_SIMPLE
 }
+enum ExportType { TODAY, LAST_HOUR, WEEKS, LAST_24_HOURS, ALL }
 
 class FlutterLogs {
   static const MethodChannel channel = const MethodChannel('flutter_logs');
@@ -94,16 +95,18 @@ class FlutterLogs {
       String port = "",
       int qos = 0,
       bool retained = false}) async {
-    final ByteData bytes = await rootBundle.load('assets/$certificate');
-    return await channel.invokeMethod('initMQTT', <String, dynamic>{
-      'topic': topic,
-      'brokerUrl': brokerUrl,
-      'certificate': bytes.buffer.asUint8List(),
-      'clientId': clientId,
-      'port': port,
-      'qos': qos,
-      'retained': retained
-    });
+    if (brokerUrl.isNotEmpty && certificate.isNotEmpty) {
+      final ByteData bytes = await rootBundle.load('assets/$certificate');
+      return await channel.invokeMethod('initMQTT', <String, dynamic>{
+        'topic': topic,
+        'brokerUrl': brokerUrl,
+        'certificate': bytes.buffer.asUint8List(),
+        'clientId': clientId,
+        'port': port,
+        'qos': qos,
+        'retained': retained
+      });
+    }
   }
 
   static Future<String> setMetaInfo({
@@ -177,6 +180,70 @@ class FlutterLogs {
     }
   }
 
+  static void logToFile(
+      {String logFileName = "",
+      bool overwrite = false,
+      String logMessage = "",
+      bool appendTimeStamp = false}) async {
+    if (logFileName.isNotEmpty) {
+      await channel.invokeMethod('logToFile', <String, dynamic>{
+        'logFileName': logFileName,
+        'overwrite': overwrite,
+        'logMessage': logMessage,
+        'appendTimeStamp': appendTimeStamp
+      });
+    } else {
+      print("Error: \'logFileName\' required.");
+    }
+  }
+
+  static void exportLogs(
+      {ExportType exportType = ExportType.ALL,
+      bool decryptBeforeExporting = false}) async {
+    await channel.invokeMethod('exportLogs', <String, dynamic>{
+      'exportType': _getExportType(exportType),
+      'decryptBeforeExporting': decryptBeforeExporting
+    });
+  }
+
+  static void printLogs(
+      {ExportType exportType = ExportType.ALL,
+      bool decryptBeforeExporting = false}) async {
+    await channel.invokeMethod('printLogs', <String, dynamic>{
+      'exportType': _getExportType(exportType),
+      'decryptBeforeExporting': decryptBeforeExporting
+    });
+  }
+
+  static void exportFileLogForName(
+      {String logFileName = "", bool decryptBeforeExporting = false}) async {
+    if (logFileName.isNotEmpty) {
+      await channel.invokeMethod('exportFileLogForName', <String, dynamic>{
+        'logFileName': logFileName,
+        'decryptBeforeExporting': decryptBeforeExporting
+      });
+    } else {
+      print("Error: \'logFileName\' required.");
+    }
+  }
+
+  static void exportAllFileLogs({bool decryptBeforeExporting = false}) async {
+    await channel.invokeMethod('exportAllFileLogs',
+        <String, dynamic>{'decryptBeforeExporting': decryptBeforeExporting});
+  }
+
+  static void printFileLogForName(
+      {String logFileName = "", bool decryptBeforeExporting = false}) async {
+    if (logFileName.isNotEmpty) {
+      await channel.invokeMethod('printFileLogForName', <String, dynamic>{
+        'logFileName': logFileName,
+        'decryptBeforeExporting': decryptBeforeExporting
+      });
+    } else {
+      print("Error: \'logFileName\' required.");
+    }
+  }
+
   static String _getDirectoryStructure(DirectoryStructure type) {
     return type.toString().split('.').last;
   }
@@ -194,6 +261,10 @@ class FlutterLogs {
   }
 
   static String _getTimeStampFormat(TimeStampFormat type) {
+    return type.toString().split('.').last;
+  }
+
+  static String _getExportType(ExportType type) {
     return type.toString().split('.').last;
   }
 }

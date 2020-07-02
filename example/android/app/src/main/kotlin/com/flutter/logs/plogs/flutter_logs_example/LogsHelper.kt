@@ -1,18 +1,14 @@
 package com.flutter.logs.plogs.flutter_logs_example
 
-import android.Manifest
 import android.content.Context
-import android.content.pm.PackageManager
 import android.os.Environment
 import android.util.Log
-import androidx.core.content.ContextCompat
 import com.blackbox.plog.elk.PLogMetaInfoProvider
 import com.blackbox.plog.elk.models.fields.MetaInfo
 import com.blackbox.plog.mqtt.PLogMQTTProvider
 import com.blackbox.plog.pLogs.PLog
 import com.blackbox.plog.pLogs.config.LogsConfig
 import com.blackbox.plog.pLogs.models.LogLevel
-import com.blackbox.plog.pLogs.models.LogType
 import com.blackbox.plog.utils.DateTimeUtils
 import java.io.File
 import java.io.InputStream
@@ -73,33 +69,6 @@ object LogsHelper {
         )
 
         PLog.applyConfigurations(config, saveToFile = true)
-    }
-
-    private fun getLogType(logType: String?): ArrayList<String> {
-        return LogType.values().map { it.type } as ArrayList<String>
-    }
-
-    private fun getLogLevel(logLevel: String?): ArrayList<LogLevel> {
-        return LogLevel.values().map { it.level } as ArrayList<LogLevel>
-    }
-
-    private fun getLogsPath(): String? {
-        return File(Environment.getExternalStorageDirectory(), "").path
-    }
-
-    private fun getLogsExportPath(): String? {
-        return getLogsPath() + File.separator + "Exported" + File.separator
-    }
-
-    private fun areStoragePermissionsGranted(context: Context): Boolean? {
-        return (ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.READ_EXTERNAL_STORAGE
-        ) == PackageManager.PERMISSION_GRANTED
-                && ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-        ) == PackageManager.PERMISSION_GRANTED)
     }
 
     fun writeLogToFile(type: String, data: String?, appendTimeStamp: Boolean) {
@@ -174,7 +143,7 @@ object LogsHelper {
             context: Context,
             writeLogsToLocalStorage: Boolean?,
             topic: String?,
-            brokerUrl: String?,
+            brokerUrl: String,
             certificateInputStream: InputStream?,
             clientId: String?,
             port: String?,
@@ -182,16 +151,18 @@ object LogsHelper {
             retained: Boolean?
 
     ) {
-        PLogMQTTProvider.initMQTTClient(context,
-                writeLogsToLocalStorage = writeLogsToLocalStorage ?: true,
-                topic = topic ?: "",
-                brokerUrl = brokerUrl ?: "",
-                certificateStream = certificateInputStream,
-                clientId = clientId ?: "",
-                port = port ?: "",
-                qos = qos ?: 0,
-                retained = retained ?: false
-        )
+        if (brokerUrl.isNotEmpty()) {
+            PLogMQTTProvider.initMQTTClient(context,
+                    writeLogsToLocalStorage = writeLogsToLocalStorage ?: true,
+                    topic = topic ?: "",
+                    brokerUrl = brokerUrl ?: "",
+                    certificateStream = certificateInputStream,
+                    clientId = clientId ?: "",
+                    port = port ?: "",
+                    qos = qos ?: 0,
+                    retained = retained ?: false
+            )
+        }
     }
 
     private fun createDir(pathName: String?): String {
