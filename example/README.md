@@ -2,6 +2,8 @@
 #### A file based advanced logging framework for Flutter Apps (Android).
 ##### iOS Support comming soon.
 
+[![pub package](https://img.shields.io/pub/v/flutter_logs)](https://pub.dev/packages/flutter_logs)
+
 Overview
 --------
 
