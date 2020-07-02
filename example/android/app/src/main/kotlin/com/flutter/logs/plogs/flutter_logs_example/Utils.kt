@@ -13,7 +13,6 @@ import java.sql.Time
 fun getLogLevelsById(key: String, call: MethodCall): ArrayList<LogLevel> {
     val listOfLogLevels = arrayListOf<LogLevel>()
     call.argument<String>(key)?.let {
-        Log.i("getLogLevelsById", "$key: ${it.split(",")}")
         it.split(",").forEach {
             listOfLogLevels.add(getLogLevel(it))
         }
@@ -25,7 +24,6 @@ fun getLogLevelsById(key: String, call: MethodCall): ArrayList<LogLevel> {
 fun getListOfStringById(key: String, call: MethodCall): ArrayList<String> {
     val logTypesList = arrayListOf<String>()
     call.argument<String>(key)?.let {
-        Log.i("getListOfStringById", "$key: ${it.split(",")}")
         it.split(",").forEach {
             logTypesList.add(it)
         }
@@ -34,18 +32,15 @@ fun getListOfStringById(key: String, call: MethodCall): ArrayList<String> {
     return arrayListOf()
 }
 
-fun getStringValueById(key: String, call: MethodCall): String? {
+fun getStringValueById(key: String, call: MethodCall): String {
     call.argument<String>(key)?.let {
-        if (it.isNotEmpty())
-            Log.i("getStringValueById", "$key: $it")
         return it
     }
-    return null
+    return ""
 }
 
 fun getIntValueById(key: String, call: MethodCall): Int? {
     call.argument<Int>(key)?.let {
-        Log.i("getIntValueById", "$key: $it")
         return it
     }
     return null
@@ -53,7 +48,6 @@ fun getIntValueById(key: String, call: MethodCall): Int? {
 
 fun getBoolValueById(key: String, call: MethodCall): Boolean? {
     call.argument<Boolean>(key)?.let {
-        Log.i("getBoolValueById", "$key: $it")
         return it
     }
     return null

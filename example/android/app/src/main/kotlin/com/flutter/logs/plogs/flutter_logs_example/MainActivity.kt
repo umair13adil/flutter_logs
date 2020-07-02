@@ -19,6 +19,7 @@ import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugins.GeneratedPluginRegistrant
 import java.io.File
+import java.lang.Exception
 
 class MainActivity : FlutterActivity() {
 
@@ -157,6 +158,36 @@ class MainActivity : FlutterActivity() {
                         )
 
                         result.success("Logs MetaInfo added for ELK stack.")
+                    }
+                    "logThis" -> {
+                        val tag = getStringValueById("tag", call)
+                        val subTag = getStringValueById("subTag", call)
+                        val logMessage = getStringValueById("logMessage", call)
+                        val level = getStringValueById("level", call)
+                        val exception = getStringValueById("e", call)
+
+                        when (getLogLevel(level)) {
+                            LogLevel.INFO -> {
+                                PLog.logThis(tag, subTag, logMessage, LogLevel.INFO)
+                            }
+                            LogLevel.WARNING -> {
+                                PLog.logThis(tag, subTag, logMessage, LogLevel.WARNING)
+                            }
+                            LogLevel.ERROR -> {
+                                if (exception.isNotEmpty()) {
+                                    PLog.logThis(tag, subTag, logMessage, Exception(exception), LogLevel.ERROR)
+                                } else {
+                                    PLog.logThis(tag, subTag, logMessage, LogLevel.ERROR)
+                                }
+                            }
+                            LogLevel.SEVERE -> {
+                                if (exception.isNotEmpty()) {
+                                    PLog.logThis(tag, subTag, logMessage, Exception(exception), LogLevel.SEVERE)
+                                } else {
+                                    PLog.logThis(tag, subTag, logMessage, LogLevel.SEVERE)
+                                }
+                            }
+                        }
                     }
                     "exportLogs" -> {
                         eventSink?.endOfStream()

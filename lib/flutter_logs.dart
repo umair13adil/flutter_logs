@@ -150,13 +150,25 @@ class FlutterLogs {
       {String tag = "",
       String subTag = "",
       String logMessage = "",
-      String level = ""}) async {
-    await channel.invokeMethod('logThis', <String, dynamic>{
-      'tag': tag,
-      'subTag': subTag,
-      'logMessage': logMessage,
-      'level': level
-    });
+      LogLevel level = LogLevel.INFO,
+      Exception e = null,
+      String errorMessage = ""}) async {
+    if (e != null) {
+      await channel.invokeMethod('logThis', <String, dynamic>{
+        'tag': tag,
+        'subTag': subTag,
+        'logMessage': logMessage,
+        'level': _getLogLevel(level),
+        'e': e.toString()
+      });
+    } else {
+      await channel.invokeMethod('logThis', <String, dynamic>{
+        'tag': tag,
+        'subTag': subTag,
+        'logMessage': logMessage,
+        'level': _getLogLevel(level)
+      });
+    }
   }
 
   static String _getDirectoryStructure(DirectoryStructure type) {

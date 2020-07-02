@@ -35,11 +35,23 @@ class _MyAppState extends State<MyApp> {
           title: const Text('Flutter Logs'),
         ),
         body: Center(
-          child: RaisedButton(
-            onPressed: () async {
-              setUpLogs();
-            },
-            child: Text('Setup Logs', style: TextStyle(fontSize: 20)),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              RaisedButton(
+                onPressed: () async {
+                  setUpLogs();
+                },
+                child: Text('Setup Logs', style: TextStyle(fontSize: 20)),
+              ),
+              RaisedButton(
+                onPressed: () async {
+                  logData();
+                },
+                child: Text('Log Something', style: TextStyle(fontSize: 20)),
+              )
+            ],
           ),
         ),
       ),
@@ -77,6 +89,19 @@ class _MyAppState extends State<MyApp> {
           isDebuggable: true);
     } on PlatformException {
       print("initState: PlatformException");
+    }
+  }
+
+  void logData() {
+    try {
+      FlutterLogs.logThis(
+          tag: 'MyApp',
+          subTag: 'logData',
+          logMessage:
+              'This is a log message: ${DateTime.now().millisecondsSinceEpoch}',
+          level: LogLevel.INFO);
+    } on PlatformException {
+      print("logData: PlatformException");
     }
   }
 }
