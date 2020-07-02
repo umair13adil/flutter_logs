@@ -1,4 +1,4 @@
-package com.flutter.logs.plogs.flutter_logs_example
+package com.flutter.logs.plogs.flutter_logs
 
 import android.content.Context
 import android.os.Environment
