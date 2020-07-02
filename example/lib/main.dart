@@ -84,6 +84,12 @@ class _MyAppState extends State<MyApp> {
                   exportFileLogs();
                 },
                 child: Text('Export File Logs', style: TextStyle(fontSize: 20)),
+              ),
+              RaisedButton(
+                onPressed: () async {
+                  FlutterLogs.clearLogs();
+                },
+                child: Text('Clear Logs', style: TextStyle(fontSize: 20)),
               )
             ],
           ),
@@ -156,7 +162,8 @@ class _MyAppState extends State<MyApp> {
         topic: "YOUR_TOPIC",
         brokerUrl: "", //Add URL without schema
         certificate: "m2mqtt_ca.crt",
-        port: "8883");
+        port: "8883",
+        writeLogsToLocalStorage: true);
   }
 
   void logData() {

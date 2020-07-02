@@ -109,9 +109,10 @@ class MainActivity : FlutterActivity() {
                         val port = getStringValueById("port", call)
                         val qos = getIntValueById("qos", call)
                         val retained = getBoolValueById("retained", call)
+                        val writeLogsToLocalStorage = getBoolValueById("writeLogsToLocalStorage", call)
 
                         LogsHelper.setMQTT(this,
-                                writeLogsToLocalStorage = true,
+                                writeLogsToLocalStorage = writeLogsToLocalStorage,
                                 topic = topic,
                                 brokerUrl = brokerUrl,
                                 certificateInputStream = certificate,
@@ -312,6 +313,9 @@ class MainActivity : FlutterActivity() {
                                         onComplete = { }
                                 )
                     }
+                    "clearLogs" -> {
+                        PLog.clearLogs()
+                    }
                     else -> result.notImplemented()
                 }
             }
@@ -370,7 +374,7 @@ class MainActivity : FlutterActivity() {
     }
 
     private fun doIfPermissionsGranted() {
-        channel?.let{
+        channel?.let {
             Log.i(TAG, "doIfPermissionsGranted: Send event.")
             it.invokeMethod("storagePermissionsGranted", "")
         }

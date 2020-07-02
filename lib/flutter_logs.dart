@@ -94,7 +94,8 @@ class FlutterLogs {
       String clientId = "",
       String port = "",
       int qos = 0,
-      bool retained = false}) async {
+      bool retained = false,
+      bool writeLogsToLocalStorage = true}) async {
     if (brokerUrl.isNotEmpty && certificate.isNotEmpty) {
       final ByteData bytes = await rootBundle.load('assets/$certificate');
       return await channel.invokeMethod('initMQTT', <String, dynamic>{
@@ -104,7 +105,8 @@ class FlutterLogs {
         'clientId': clientId,
         'port': port,
         'qos': qos,
-        'retained': retained
+        'retained': retained,
+        'writeLogsToLocalStorage': writeLogsToLocalStorage
       });
     }
   }
@@ -242,6 +244,10 @@ class FlutterLogs {
     } else {
       print("Error: \'logFileName\' required.");
     }
+  }
+
+  static void clearLogs() async {
+    await channel.invokeMethod('clearLogs');
   }
 
   static String _getDirectoryStructure(DirectoryStructure type) {
