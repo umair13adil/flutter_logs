@@ -61,7 +61,20 @@ class _MyAppState extends State<MyApp> {
     try {
       print("setUpLogs: Setting up logs..");
       await FlutterLogs.initLogs(
-          savePath: "MyLogs", debugFileOperations: true, isDebuggable: true);
+          logLevelsEnabled: [
+            LogLevel.INFO,
+            LogLevel.WARNING,
+            LogLevel.ERROR,
+            LogLevel.SEVERE
+          ],
+          timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
+          directoryStructure: DirectoryStructure.FOR_DATE,
+          logTypesEnabled: ["My_Log_File"],
+          logFileExtension: LogFileExtension.LOG,
+          logsWriteDirectoryName: "MyLogs",
+          logsExportDirectoryName: "MyLogs/Exported",
+          debugFileOperations: true,
+          isDebuggable: true);
     } on PlatformException {
       print("initState: PlatformException");
     }

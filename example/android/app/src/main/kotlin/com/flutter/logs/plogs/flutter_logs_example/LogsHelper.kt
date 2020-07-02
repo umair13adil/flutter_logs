@@ -11,21 +11,19 @@ import com.blackbox.plog.elk.models.fields.MetaInfo
 import com.blackbox.plog.mqtt.PLogMQTTProvider
 import com.blackbox.plog.pLogs.PLog
 import com.blackbox.plog.pLogs.config.LogsConfig
-import com.blackbox.plog.pLogs.formatter.TimeStampFormat
-import com.blackbox.plog.pLogs.models.LogExtension
 import com.blackbox.plog.pLogs.models.LogLevel
 import com.blackbox.plog.pLogs.models.LogType
-import com.blackbox.plog.pLogs.structure.DirectoryStructure
 import com.blackbox.plog.utils.DateTimeUtils
 import java.io.File
 import java.io.InputStream
+
 
 object LogsHelper {
 
     private val TAG = "LogsHelper"
 
-    fun setUpLogger(logLevelsEnabled: String?,
-                    logTypesEnabled: String?,
+    fun setUpLogger(logLevelsEnabled: ArrayList<LogLevel>,
+                    logTypesEnabled: ArrayList<String>,
                     logsRetentionPeriodInDays: Int?,
                     zipsRetentionPeriodInDays: Int?,
                     autoDeleteZipOnExport: Boolean?,
@@ -33,14 +31,14 @@ object LogsHelper {
                     autoExportErrors: Boolean?,
                     encryptionEnabled: Boolean?,
                     encryptionKey: String?,
-            //directoryStructure = DirectoryStructure.FOR_DATE,
+                    directoryStructure: String?,
                     logSystemCrashes: Boolean?,
                     isDebuggable: Boolean?,
                     debugFileOperations: Boolean?,
                     attachTimeStamp: Boolean?,
                     attachNoOfFiles: Boolean?,
-            //timeStampFormat = TimeStampFormat.TIME_FORMAT_READABLE,
-            //logFileExtension = LogExtension.LOG,
+                    timeStampFormat: String?,
+                    logFileExtension: String?,
                     zipFilesOnly: Boolean?,
                     savePath: String?,
                     zipFileName: String?,
@@ -49,8 +47,8 @@ object LogsHelper {
                     enabled: Boolean?) {
 
         val config = LogsConfig(
-                //logLevelsEnabled = logLevelsEnabled,
-                //logTypesEnabled = logTypesEnabled,
+                logLevelsEnabled = logLevelsEnabled,
+                logTypesEnabled = logTypesEnabled,
                 logsRetentionPeriodInDays = logsRetentionPeriodInDays ?: 7,
                 zipsRetentionPeriodInDays = zipsRetentionPeriodInDays ?: 7,
                 autoDeleteZipOnExport = autoDeleteZipOnExport ?: false,
@@ -58,14 +56,14 @@ object LogsHelper {
                 autoExportErrors = autoExportErrors ?: false,
                 encryptionEnabled = encryptionEnabled ?: false,
                 encryptionKey = encryptionKey ?: "",
-                directoryStructure = DirectoryStructure.FOR_DATE,
+                directoryStructure = getDirectoryStructure(directoryStructure),
                 logSystemCrashes = logSystemCrashes ?: false,
                 isDebuggable = isDebuggable ?: false,
                 debugFileOperations = debugFileOperations ?: false,
                 attachTimeStamp = attachTimeStamp ?: false,
                 attachNoOfFiles = attachNoOfFiles ?: false,
-                timeStampFormat = TimeStampFormat.TIME_FORMAT_READABLE,
-                logFileExtension = LogExtension.LOG,
+                timeStampFormat = getTimeStampFormat(timeStampFormat),
+                logFileExtension = getLogFileExtension(logFileExtension),
                 zipFilesOnly = zipFilesOnly ?: false,
                 savePath = createDir(savePath),
                 zipFileName = zipFileName ?: "",
@@ -121,8 +119,7 @@ object LogsHelper {
         }
     }
 
-    fun setupForELKStack(context: Context,
-                         appId: String?,
+    fun setupForELKStack(appId: String?,
                          appName: String?,
                          appVersion: String?,
                          deviceId: String?,
@@ -173,10 +170,10 @@ object LogsHelper {
             clientId: String?
     ) {
         PLogMQTTProvider.initMQTTClient(context,
-                writeLogsToLocalStorage = writeLogsToLocalStorage ?: false,
+                writeLogsToLocalStorage = writeLogsToLocalStorage ?: true,
                 topic = topic ?: "",
                 brokerUrl = brokerUrl ?: "",
-                certificateRes = R.raw.m2mqtt_ca,
+                certificateStream = certificateInputStream,
                 clientId = clientId ?: ""
         )
     }

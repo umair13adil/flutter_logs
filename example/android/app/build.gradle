@@ -62,5 +62,5 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
     //PLogs
-    implementation "com.github.umair13adil:RxLogs:1.0.3"
+    implementation "com.github.umair13adil:RxLogs:1.0.4"
 }

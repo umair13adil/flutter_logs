@@ -10,6 +10,8 @@ import androidx.annotation.NonNull
 import androidx.core.content.ContextCompat
 import com.blackbox.plog.pLogs.PLog
 import com.blackbox.plog.pLogs.impl.PLogImpl
+import com.blackbox.plog.pLogs.models.LogLevel
+import com.blackbox.plog.pLogs.models.LogType
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.BinaryMessenger
@@ -46,8 +48,8 @@ class MainActivity : FlutterActivity() {
                 when (call.method) {
                     "initLogs" -> {
 
-                        val logLevelsEnabled = getStringValueById("logLevelsEnabled", call)
-                        val logTypesEnabled = getStringValueById("logTypesEnabled", call)
+                        val logLevelsEnabled = getLogLevelsById("logLevelsEnabled", call)
+                        val logTypesEnabled = getListOfStringById("logTypesEnabled", call)
                         val logsRetentionPeriodInDays = getIntValueById("logsRetentionPeriodInDays", call)
                         val zipsRetentionPeriodInDays = getIntValueById("zipsRetentionPeriodInDays", call)
                         val autoDeleteZipOnExport = getBoolValueById("autoDeleteZipOnExport", call)
@@ -55,11 +57,14 @@ class MainActivity : FlutterActivity() {
                         val autoExportErrors = getBoolValueById("autoExportErrors", call)
                         val encryptionEnabled = getBoolValueById("encryptionEnabled", call)
                         val encryptionKey = getStringValueById("encryptionKey", call)
+                        val directoryStructure = getStringValueById("directoryStructure", call)
                         val logSystemCrashes = getBoolValueById("logSystemCrashes", call)
                         val isDebuggable = getBoolValueById("isDebuggable", call)
                         val debugFileOperations = getBoolValueById("debugFileOperations", call)
                         val attachTimeStamp = getBoolValueById("attachTimeStamp", call)
                         val attachNoOfFiles = getBoolValueById("attachNoOfFiles", call)
+                        val timeStampFormat = getStringValueById("timeStampFormat", call)
+                        val logFileExtension = getStringValueById("logFileExtension", call)
                         val zipFilesOnly = getBoolValueById("zipFilesOnly", call)
                         val savePath = getStringValueById("savePath", call)
                         val zipFileName = getStringValueById("zipFileName", call)
@@ -77,14 +82,14 @@ class MainActivity : FlutterActivity() {
                                 autoExportErrors = autoExportErrors,
                                 encryptionEnabled = encryptionEnabled,
                                 encryptionKey = encryptionKey,
-                                //directoryStructure = DirectoryStructure.FOR_DATE,
+                                directoryStructure = directoryStructure,
                                 logSystemCrashes = logSystemCrashes,
                                 isDebuggable = isDebuggable,
                                 debugFileOperations = debugFileOperations,
                                 attachTimeStamp = attachTimeStamp,
                                 attachNoOfFiles = attachNoOfFiles,
-                                //timeStampFormat = TimeStampFormat.TIME_FORMAT_READABLE,
-                                //logFileExtension = LogExtension.LOG,
+                                timeStampFormat = timeStampFormat,
+                                logFileExtension = logFileExtension,
                                 zipFilesOnly = zipFilesOnly,
                                 savePath = savePath,
                                 zipFileName = zipFileName,
@@ -131,7 +136,7 @@ class MainActivity : FlutterActivity() {
                         val longitude = getStringValueById("longitude", call)
                         val labels = getStringValueById("labels", call)
 
-                        LogsHelper.setupForELKStack(this,
+                        LogsHelper.setupForELKStack(
                                 appId = appId,
                                 appName = appName,
                                 appVersion = appVersion,
@@ -156,7 +161,6 @@ class MainActivity : FlutterActivity() {
                     "exportLogs" -> {
                         eventSink?.endOfStream()
                         eventSink = null
-
                         result.success("Logs exported.")
                     }
                     else -> result.notImplemented()
@@ -212,8 +216,8 @@ class MainActivity : FlutterActivity() {
         }
     }
 
-    private fun doIfPermissionsGranted(){
-        Log.i(TAG,"doIfPermissionsGranted: Send event.")
+    private fun doIfPermissionsGranted() {
+        Log.i(TAG, "doIfPermissionsGranted: Send event.")
         channel?.invokeMethod("storagePermissionsGranted", "")
     }
 }
