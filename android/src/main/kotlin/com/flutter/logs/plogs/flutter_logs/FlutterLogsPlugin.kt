@@ -82,6 +82,7 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware, PluginRegistry.RequestPe
                         val enabled = getBoolValueById("enabled", call)
 
                         LogsHelper.setUpLogger(
+                                context = context,
                                 logLevelsEnabled = logLevelsEnabled,
                                 logTypesEnabled = logTypesEnabled,
                                 logsRetentionPeriodInDays = logsRetentionPeriodInDays,
@@ -153,6 +154,7 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware, PluginRegistry.RequestPe
                         val labels = getStringValueById("labels", call)
 
                         LogsHelper.setupForELKStack(
+                                context = context,
                                 appId = appId,
                                 appName = appName,
                                 appVersion = appVersion,
@@ -211,9 +213,9 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware, PluginRegistry.RequestPe
                         val appendTimeStamp = getBoolValueById("appendTimeStamp", call)
 
                         if (overwrite) {
-                            LogsHelper.overWriteLogToFile(logFileName, logMessage, appendTimeStamp)
+                            LogsHelper.overWriteLogToFile(context, logFileName, logMessage, appendTimeStamp)
                         } else {
-                            LogsHelper.writeLogToFile(logFileName, logMessage, appendTimeStamp)
+                            LogsHelper.writeLogToFile(context, logFileName, logMessage, appendTimeStamp)
                         }
                     }
                     "exportLogs" -> {
@@ -341,9 +343,7 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware, PluginRegistry.RequestPe
 
         @JvmStatic
         private fun notifyIfPermissionsGranted(context: Context) {
-            val granted = ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
-                    && ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
-            if (granted) {
+            if (LogsHelper.permissionsGranted(context)) {
                 doIfPermissionsGranted()
             }
         }
@@ -363,7 +363,8 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware, PluginRegistry.RequestPe
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     currentActivity?.let {
                         ActivityCompat.requestPermissions(it, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE), REQUEST_STORAGE_PERMISSIONS)
-                    } ?: Log.e(TAG, "requestStoragePermission: Unable to request storage permissions.")
+                    }
+                            ?: Log.e(TAG, "requestStoragePermission: Unable to request storage permissions.")
                 } else {
                     doIfPermissionsGranted()
                 }

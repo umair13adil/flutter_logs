@@ -1,8 +1,11 @@
 package com.flutter.logs.plogs.flutter_logs
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Environment
 import android.util.Log
+import androidx.core.content.ContextCompat
 import com.blackbox.plog.elk.PLogMetaInfoProvider
 import com.blackbox.plog.elk.models.fields.MetaInfo
 import com.blackbox.plog.mqtt.PLogMQTTProvider
@@ -18,7 +21,7 @@ object LogsHelper {
 
     private val TAG = "LogsHelper"
 
-    fun setUpLogger(logLevelsEnabled: ArrayList<LogLevel>,
+    fun setUpLogger(context: Context, logLevelsEnabled: ArrayList<LogLevel>,
                     logTypesEnabled: ArrayList<String>,
                     logsRetentionPeriodInDays: Int?,
                     zipsRetentionPeriodInDays: Int?,
@@ -41,6 +44,11 @@ object LogsHelper {
                     exportPath: String?,
                     singleLogFileSize: Int?,
                     enabled: Boolean?) {
+
+        if (!permissionsGranted(context)) {
+            Log.e(TAG, "setUpLogger: Unable to setup logs. Permissions not granted.")
+            return
+        }
 
         createDir(savePath + File.separator + "Logs")
 
@@ -73,7 +81,13 @@ object LogsHelper {
         PLog.applyConfigurations(config, saveToFile = true)
     }
 
-    fun writeLogToFile(type: String, data: String?, appendTimeStamp: Boolean) {
+    fun writeLogToFile(context: Context, type: String, data: String?, appendTimeStamp: Boolean) {
+
+        if (!permissionsGranted(context)) {
+            Log.e(TAG, "writeLogToFile: Unable to setup logs. Permissions not granted.")
+            return
+        }
+        
         try {
             if (appendTimeStamp) {
                 PLog.getLoggerFor(type)
@@ -87,7 +101,13 @@ object LogsHelper {
         }
     }
 
-    fun overWriteLogToFile(type: String, data: String?, appendTimeStamp: Boolean) {
+    fun overWriteLogToFile(context: Context, type: String, data: String?, appendTimeStamp: Boolean) {
+
+        if (!permissionsGranted(context)) {
+            Log.e(TAG, "overWriteLogToFile: Unable to setup logs. Permissions not granted.")
+            return
+        }
+        
         try {
             if (appendTimeStamp) {
                 PLog.getLoggerFor(type)?.overwriteToFile("$data [${DateTimeUtils.getTimeFormatted()}]")
@@ -99,7 +119,8 @@ object LogsHelper {
         }
     }
 
-    fun setupForELKStack(appId: String?,
+    fun setupForELKStack(context: Context, 
+                         appId: String?,
                          appName: String?,
                          appVersion: String?,
                          deviceId: String?,
@@ -116,6 +137,12 @@ object LogsHelper {
                          deviceManufacturer: String?,
                          deviceModel: String?,
                          deviceSdkInt: String?) {
+
+        if (!permissionsGranted(context)) {
+            Log.e(TAG, "setupForELKStack: Unable to setup logs. Permissions not granted.")
+            return
+        }
+        
         PLogMetaInfoProvider.elkStackSupported = true
 
         PLogMetaInfoProvider.setMetaInfo(
@@ -153,6 +180,11 @@ object LogsHelper {
             retained: Boolean?
 
     ) {
+        if (!permissionsGranted(context)) {
+            Log.e(TAG, "setMQTT: Unable to setup logs. Permissions not granted.")
+            return
+        }
+        
         if (brokerUrl.isNotEmpty()) {
             PLogMQTTProvider.initMQTTClient(context,
                     writeLogsToLocalStorage = writeLogsToLocalStorage ?: true,
@@ -173,5 +205,10 @@ object LogsHelper {
             val result = file.mkdirs()
             file.path
         } else file.path
+    }
+
+    fun permissionsGranted(context: Context): Boolean {
+        return ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
     }
 }
