@@ -45,6 +45,29 @@ dependencies:
 import 'package:flutter_logs/flutter_logs.dart';
 ```
 
+## Setting Up
+
+#### Init Logs
+_______________________________________________
+
+```dart
+    await FlutterLogs.initLogs(
+        logLevelsEnabled: [
+          LogLevel.INFO,
+          LogLevel.WARNING,
+          LogLevel.ERROR,
+          LogLevel.SEVERE
+        ],
+        timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
+        directoryStructure: DirectoryStructure.FOR_DATE,
+        logTypesEnabled: [_my_log_file_name],
+        logFileExtension: LogFileExtension.LOG,
+        logsWriteDirectoryName: "MyLogs",
+        logsExportDirectoryName: "MyLogs/Exported",
+        debugFileOperations: true,
+        isDebuggable: true);
+```
+
 ## How it works?
 
 Hourly Logs
@@ -53,7 +76,6 @@ Hourly Logs
 Hourly logs are autumatically generated once this line is called:
 
 ```dart
-
 FlutterLogs.logThis(
         tag: 'MyApp',
         subTag: 'logData',
@@ -73,7 +95,6 @@ If you want to log data into a specific file for some events, you can do this in
 Define log file name in logs configuration:
 
 ```dart
-    
     await FlutterLogs.initLogs(
         logTypesEnabled: ["Locations","Jobs","API"]);
  ```
@@ -84,7 +105,6 @@ Define log file name in logs configuration:
 Log data to file. You can choose to either append to file or overwrite to complete file.
 
 ```dart
-    
     FlutterLogs.logToFile(
         logFileName: "Locations",
         overwrite: false,
@@ -98,7 +118,6 @@ Export Logs
 You can export logs to output path sepcified in logs configuration:
 
 ```dart
-    
     await FlutterLogs.initLogs(
         logsExportDirectoryName: "MyLogs/Exported");
 ```
@@ -106,7 +125,6 @@ You can export logs to output path sepcified in logs configuration:
 To export logs call this:
 
 ```dart
-    
     FlutterLogs.exportLogs(
         exportType: ExportType.ALL, decryptBeforeExporting: true);
 ```
@@ -114,7 +132,6 @@ To export logs call this:
 To export custom file logs:
 
 ```dart
-    
  FlutterLogs.exportFileLogForName(
         logFileName: "Locations", decryptBeforeExporting: true);
 ```
@@ -123,32 +140,7 @@ Clear Logs
 -----------
 
 ```dart
-    
  FlutterLogs.clearLogs();
-```
-
-## Setting Up
-
-#### Init Logs
-_______________________________________________
-
-```dart
-    
-    await FlutterLogs.initLogs(
-        logLevelsEnabled: [
-          LogLevel.INFO,
-          LogLevel.WARNING,
-          LogLevel.ERROR,
-          LogLevel.SEVERE
-        ],
-        timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
-        directoryStructure: DirectoryStructure.FOR_DATE,
-        logTypesEnabled: [_my_log_file_name],
-        logFileExtension: LogFileExtension.LOG,
-        logsWriteDirectoryName: "MyLogs",
-        logsExportDirectoryName: "MyLogs/Exported",
-        debugFileOperations: true,
-        isDebuggable: true);
 ```
 
 #### ELK Elastic Stack Schema Support
@@ -157,7 +149,6 @@ _______________________________________________
 Send additional Meta info for better filtering at LogStash dashboard. With this setting, logs will be logged as JSON-delemited.
 
 ```dart
-
     await FlutterLogs.setMetaInfo(
       appId: "flutter_logs_example",
       appName: "Flutter Logs Demo",
@@ -185,7 +176,6 @@ Send additional Meta info for better filtering at LogStash dashboard. With this 
 Output of logs will be like this:
 
 ```json
-
 {
   "user": {
     "user.email": "m.umair.adil@gmail.com",
@@ -241,18 +231,15 @@ Add certificate in your assets directory.
 Add following line in your pubspec file.
 
 ```yml
-
 flutter:
   assets:
      - m2mqtt_ca.crt
-
 ```
 
 ##### Step 3: 
 Add following block for initializing MQTT logging.
 
-```dart
-        
+```dart 
     await FlutterLogs.initMQTT(
         topic: "YOUR_TOPIC",
         brokerUrl: "", //Add URL without schema
@@ -263,7 +250,6 @@ Add following block for initializing MQTT logging.
 That's it, MQTT setup is done. If only MQTT feature is required then set this flag to false to stop writing logs to storage directory:
 
 ```dart
-        
     await FlutterLogs.initMQTT(
         writeLogsToLocalStorage: false);
 ```
@@ -273,6 +259,8 @@ _______________________________________________
 ## Native Libraries
 
 * For Android: [RxLogs](https://github.com/umair13adil/RxLogs) 
+
+For more details about RxLogs visit this [Wiki](https://github.com/umair13adil/RxLogs/wiki)
 
 # Author
 

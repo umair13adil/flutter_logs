@@ -97,7 +97,7 @@ class FlutterLogs {
       bool retained = false,
       bool writeLogsToLocalStorage = true}) async {
     if (brokerUrl.isNotEmpty && certificate.isNotEmpty) {
-      final ByteData bytes = await rootBundle.load('assets/$certificate');
+      final ByteData bytes = await rootBundle.load('$certificate');
       return await channel.invokeMethod('initMQTT', <String, dynamic>{
         'topic': topic,
         'brokerUrl': brokerUrl,
