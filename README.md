@@ -13,7 +13,9 @@ Flutter logs can work with Logstash by writing JSON delimited logs to log files.
 
 ![Image1](pictures/picture1.png)
 
-Read more about flutter_logs usage on this [Medium article](https://itnext.io/sending-logs-from-flutter-apps-in-real-time-using-elk-stack-mqtt-c24fa0cb9802)
+##### Read more about flutter_logs usage on this Medium article: 
+
+[Sending logs from Flutter apps in real-time using ELK stack & MQTT](https://itnext.io/sending-logs-from-flutter-apps-in-real-time-using-elk-stack-mqtt-c24fa0cb9802)
 
 Features
 --------
