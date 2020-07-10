@@ -157,8 +157,8 @@ class _MyAppState extends State<MyApp> {
       deviceModel: "989892BBN",
       deviceSdkInt: "26",
       deviceBatteryPercent: "27",
-      latitude: "0.0",
-      longitude: "0.0",
+      latitude: "55.0",
+      longitude: "-76.0",
       labels: "",
     );
   }
