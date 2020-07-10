@@ -192,14 +192,16 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware, PluginRegistry.RequestPe
                             }
                             LogLevel.ERROR -> {
                                 if (exception.isNotEmpty()) {
-                                    PLog.logThis(tag, subTag, logMessage, Exception(exception), LogLevel.ERROR)
+                                    //PLog.logThis(tag, subTag, logMessage, Throwable(exception), LogLevel.ERROR)
+                                    PLog.logThis(tag, subTag, exception, LogLevel.ERROR)
                                 } else {
                                     PLog.logThis(tag, subTag, logMessage, LogLevel.ERROR)
                                 }
                             }
                             LogLevel.SEVERE -> {
                                 if (exception.isNotEmpty()) {
-                                    PLog.logThis(tag, subTag, logMessage, Exception(exception), LogLevel.SEVERE)
+                                    //PLog.logThis(tag, subTag, logMessage, Throwable(exception), LogLevel.SEVERE)
+                                    PLog.logThis(tag, subTag, exception, LogLevel.SEVERE)
                                 } else {
                                     PLog.logThis(tag, subTag, logMessage, LogLevel.SEVERE)
                                 }

@@ -1,9 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'dart:async';
-
-import 'package:flutter/services.dart';
 import 'package:flutter_logs/flutter_logs.dart';
 
 void main() {
@@ -51,9 +48,15 @@ class _MyAppState extends State<MyApp> {
               ),
               RaisedButton(
                 onPressed: () async {
-                  logData();
+                  logData(isException: false);
                 },
                 child: Text('Log Something', style: TextStyle(fontSize: 20)),
+              ),
+              RaisedButton(
+                onPressed: () async {
+                  logData(isException: true);
+                },
+                child: Text('Log Exception', style: TextStyle(fontSize: 20)),
               ),
               RaisedButton(
                 onPressed: () async {
@@ -160,19 +163,34 @@ class _MyAppState extends State<MyApp> {
   void doSetupForMQTT() async {
     await FlutterLogs.initMQTT(
         topic: "YOUR_TOPIC",
-        brokerUrl: "", //Add URL without schema
+        brokerUrl: "",
+        //Add URL without schema
         certificate: "m2mqtt_ca.crt",
         port: "8883",
         writeLogsToLocalStorage: true);
   }
 
-  void logData() {
-    FlutterLogs.logThis(
-        tag: 'MyApp',
-        subTag: 'logData',
-        logMessage:
-            'This is a log message: ${DateTime.now().millisecondsSinceEpoch}',
-        level: LogLevel.INFO);
+  void logData({bool isException}) {
+    if (!isException) {
+      FlutterLogs.logThis(
+          tag: 'MyApp',
+          subTag: 'logData',
+          logMessage:
+              'This is a log message: ${DateTime.now().millisecondsSinceEpoch}',
+          level: LogLevel.INFO);
+    } else {
+      try {
+        var i = null;
+        print(i*10);
+      } catch (e) {
+        FlutterLogs.logThis(
+            tag: 'MyApp',
+            subTag: 'Trying to convert value into string.',
+            logMessage: 'Caught an exception!',
+            e: e,
+            level: LogLevel.ERROR);
+      }
+    }
   }
 
   void logToFile() {
