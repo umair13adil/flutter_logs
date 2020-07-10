@@ -115,8 +115,8 @@ Log data to file. You can choose to either append to file or overwrite to comple
             "{0.0,0.0}");
  ```
 
-Export Logs
------------
+Export/Print Logs
+-----------------
 
 You can export logs to output path sepcified in logs configuration:
 
@@ -132,6 +132,11 @@ To export logs call this:
         exportType: ExportType.ALL, decryptBeforeExporting: true);
 ```
 
+```dart
+    FlutterLogs.printLogs(
+        exportType: ExportType.ALL, decryptBeforeExporting: true);
+```
+
 To export custom file logs:
 
 ```dart
@@ -139,11 +144,61 @@ To export custom file logs:
         logFileName: "Locations", decryptBeforeExporting: true);
 ```
 
+```dart
+ FlutterLogs.printFileLogForName(
+        logFileName: "Locations", decryptBeforeExporting: true);
+```
+
+Listen to export/print results:
+
+```dart
+    FlutterLogs.channel.setMethodCallHandler((call) async {
+        if (call.method == 'logsExported') {
+          print("logsExported: ${call.arguments.toString()}");
+        }
+      });
+```
+
 Clear Logs
 -----------
 
 ```dart
  FlutterLogs.clearLogs();
+```
+
+Errors/Exception Logs
+---------------------
+
+Printing exception logs:
+
+```dart
+      try {
+          var i = 100 ~/ 0;
+          print("$i");
+      } catch (e) {
+          FlutterLogs.logThis(
+              tag: 'MyApp',
+              subTag: 'Caught an exception.',
+              logMessage: 'Caught an exception!',
+              exception: e,
+              level: LogLevel.ERROR);
+      }
+```
+
+Printing error logs:
+
+```dart
+      try {
+          var i = null;
+          print(i * 10);
+      } catch (e) {
+          FlutterLogs.logThis(
+              tag: 'MyApp',
+              subTag: 'Caught an error.',
+              logMessage: 'Caught an exception!',
+              error: e,
+              level: LogLevel.ERROR);
+      }
 ```
 
 #### ELK Elastic Stack Schema Support
