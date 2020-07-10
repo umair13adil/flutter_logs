@@ -87,7 +87,7 @@ object LogsHelper {
             Log.e(TAG, "writeLogToFile: Unable to setup logs. Permissions not granted.")
             return
         }
-        
+
         try {
             if (appendTimeStamp) {
                 PLog.getLoggerFor(type)
@@ -107,7 +107,7 @@ object LogsHelper {
             Log.e(TAG, "overWriteLogToFile: Unable to setup logs. Permissions not granted.")
             return
         }
-        
+
         try {
             if (appendTimeStamp) {
                 PLog.getLoggerFor(type)?.overwriteToFile("$data [${DateTimeUtils.getTimeFormatted()}]")
@@ -119,7 +119,7 @@ object LogsHelper {
         }
     }
 
-    fun setupForELKStack(context: Context, 
+    fun setupForELKStack(context: Context,
                          appId: String?,
                          appName: String?,
                          appVersion: String?,
@@ -127,6 +127,7 @@ object LogsHelper {
                          environmentId: String?,
                          environmentName: String?,
                          organizationId: String?,
+                         organizationUnitId: String?,
                          language: String?,
                          userId: String?,
                          userName: String?,
@@ -136,13 +137,18 @@ object LogsHelper {
                          deviceName: String?,
                          deviceManufacturer: String?,
                          deviceModel: String?,
-                         deviceSdkInt: String?) {
+                         deviceSdkInt: String?,
+                         deviceBatteryPercent: String?,
+                         latitude: String?,
+                         longitude: String?,
+                         labels: String?
+    ) {
 
         if (!permissionsGranted(context)) {
             Log.e(TAG, "setupForELKStack: Unable to setup logs. Permissions not granted.")
             return
         }
-        
+
         PLogMetaInfoProvider.elkStackSupported = true
 
         PLogMetaInfoProvider.setMetaInfo(
@@ -154,6 +160,7 @@ object LogsHelper {
                         environmentId = environmentId ?: "",
                         environmentName = environmentName ?: "",
                         organizationId = organizationId ?: "",
+                        organizationUnitId = organizationUnitId ?: "",
                         language = language ?: "",
                         userId = userId ?: "",
                         userName = userName ?: "",
@@ -163,7 +170,11 @@ object LogsHelper {
                         deviceName = deviceName ?: "",
                         deviceManufacturer = deviceManufacturer ?: "",
                         deviceModel = deviceModel ?: "",
-                        deviceSdkInt = deviceSdkInt ?: ""
+                        deviceSdkInt = deviceSdkInt ?: "",
+                        batteryPercent = deviceBatteryPercent ?: "",
+                        latitude = latitude?.toDouble() ?: 0.0,
+                        longitude = longitude?.toDouble() ?: 0.0
+                        //labels = labels ?: ""
                 )
         )
     }
@@ -184,7 +195,7 @@ object LogsHelper {
             Log.e(TAG, "setMQTT: Unable to setup logs. Permissions not granted.")
             return
         }
-        
+
         if (brokerUrl.isNotEmpty()) {
             PLogMQTTProvider.initMQTTClient(context,
                     writeLogsToLocalStorage = writeLogsToLocalStorage ?: true,

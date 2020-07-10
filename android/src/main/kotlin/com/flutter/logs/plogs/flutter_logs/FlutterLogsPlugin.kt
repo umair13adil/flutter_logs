@@ -140,6 +140,7 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware, PluginRegistry.RequestPe
                         val environmentId = getStringValueById("environmentId", call)
                         val environmentName = getStringValueById("environmentName", call)
                         val organizationId = getStringValueById("organizationId", call)
+                        val organizationUnitId = getStringValueById("organizationUnitId", call)
                         val userId = getStringValueById("userId", call)
                         val userName = getStringValueById("userName", call)
                         val userEmail = getStringValueById("userEmail", call)
@@ -149,6 +150,7 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware, PluginRegistry.RequestPe
                         val deviceManufacturer = getStringValueById("deviceManufacturer", call)
                         val deviceModel = getStringValueById("deviceModel", call)
                         val deviceSdkInt = getStringValueById("deviceSdkInt", call)
+                        val deviceBatteryPercent = getStringValueById("deviceBatteryPercent", call)
                         val latitude = getStringValueById("latitude", call)
                         val longitude = getStringValueById("longitude", call)
                         val labels = getStringValueById("labels", call)
@@ -162,6 +164,7 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware, PluginRegistry.RequestPe
                                 environmentId = environmentId,
                                 environmentName = environmentName,
                                 organizationId = organizationId,
+                                organizationUnitId = organizationUnitId,
                                 language = language,
                                 userId = userId,
                                 userName = userName,
@@ -171,7 +174,11 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware, PluginRegistry.RequestPe
                                 deviceName = deviceName,
                                 deviceManufacturer = deviceManufacturer,
                                 deviceModel = deviceModel,
-                                deviceSdkInt = deviceSdkInt
+                                deviceSdkInt = deviceSdkInt,
+                                deviceBatteryPercent = deviceBatteryPercent,
+                                latitude = latitude,
+                                longitude = longitude,
+                                labels = labels
                         )
 
                         result.success("Logs MetaInfo added for ELK stack.")
