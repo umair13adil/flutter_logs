@@ -78,7 +78,7 @@ object LogsHelper {
                 enabled = enabled ?: true
         )
 
-        PLog.applyConfigurations(config, saveToFile = true)
+        PLog.applyConfigurations(config, saveToFile = true, context = context)
     }
 
     fun writeLogToFile(context: Context, type: String, data: String?, appendTimeStamp: Boolean) {
