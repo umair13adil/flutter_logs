@@ -162,15 +162,24 @@ class FlutterLogs {
       String subTag = "",
       String logMessage = "",
       LogLevel level = LogLevel.INFO,
-      Error e = null,
+      Exception exception = null,
+      Error error = null,
       String errorMessage = ""}) async {
-    if (e != null) {
+    if (exception != null) {
       await channel.invokeMethod('logThis', <String, dynamic>{
         'tag': tag,
         'subTag': subTag,
         'logMessage': logMessage,
         'level': _getLogLevel(level),
-        'e': e.stackTrace.toString()
+        'e': exception.toString()
+      });
+    } else if (error != null) {
+      await channel.invokeMethod('logThis', <String, dynamic>{
+        'tag': tag,
+        'subTag': subTag,
+        'logMessage': logMessage,
+        'level': _getLogLevel(level),
+        'e': error.stackTrace.toString()
       });
     } else {
       await channel.invokeMethod('logThis', <String, dynamic>{

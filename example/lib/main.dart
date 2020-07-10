@@ -14,6 +14,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   var _my_log_file_name = "MyLogFile";
+  var toggle = false;
 
   @override
   void initState() {
@@ -180,15 +181,31 @@ class _MyAppState extends State<MyApp> {
           level: LogLevel.INFO);
     } else {
       try {
-        var i = null;
-        print(i*10);
+        if (toggle) {
+          toggle = false;
+          var i = 100 ~/ 0;
+          print("$i");
+        } else {
+          toggle = true;
+          var i = null;
+          print(i * 10);
+        }
       } catch (e) {
-        FlutterLogs.logThis(
-            tag: 'MyApp',
-            subTag: 'Trying to convert value into string.',
-            logMessage: 'Caught an exception!',
-            e: e,
-            level: LogLevel.ERROR);
+        if (e is Error) {
+          FlutterLogs.logThis(
+              tag: 'MyApp',
+              subTag: 'Caught an error.',
+              logMessage: 'Caught an exception!',
+              error: e,
+              level: LogLevel.ERROR);
+        } else {
+          FlutterLogs.logThis(
+              tag: 'MyApp',
+              subTag: 'Caught an exception.',
+              logMessage: 'Caught an exception!',
+              exception: e,
+              level: LogLevel.ERROR);
+        }
       }
     }
   }
