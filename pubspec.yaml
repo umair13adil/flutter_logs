@@ -1,6 +1,6 @@
 name: flutter_logs
 description: A new flutter plugin project.
-version: 1.0.0+2
+version: 2.0.1
 homepage: https://github.com/umair13adil/flutter_logs
 
 environment:
