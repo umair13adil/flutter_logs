@@ -118,6 +118,8 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware, PluginRegistry.RequestPe
                         val qos = getIntValueById("qos", call)
                         val retained = getBoolValueById("retained", call)
                         val writeLogsToLocalStorage = getBoolValueById("writeLogsToLocalStorage", call)
+                        val debug = getBoolValueById("debug", call)
+                        val initialDelaySecondsForPublishing = getIntValueById("initialDelaySecondsForPublishing", call)
 
                         LogsHelper.setMQTT(context,
                                 writeLogsToLocalStorage = writeLogsToLocalStorage,
@@ -127,7 +129,9 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware, PluginRegistry.RequestPe
                                 clientId = clientId,
                                 port = port,
                                 qos = qos,
-                                retained = retained)
+                                retained = retained,
+                                debug = debug,
+                                initialDelaySecondsForPublishing = initialDelaySecondsForPublishing)
 
                         result.success("MQTT setup added.")
                     }

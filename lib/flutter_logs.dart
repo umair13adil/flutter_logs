@@ -95,7 +95,9 @@ class FlutterLogs {
       String port = "",
       int qos = 0,
       bool retained = false,
-      bool writeLogsToLocalStorage = true}) async {
+      bool writeLogsToLocalStorage = true,
+      bool debug = true,
+      int initialDelaySecondsForPublishing = 30}) async {
     if (brokerUrl.isNotEmpty && certificate.isNotEmpty) {
       final ByteData bytes = await rootBundle.load('$certificate');
       return await channel.invokeMethod('initMQTT', <String, dynamic>{
@@ -106,7 +108,9 @@ class FlutterLogs {
         'port': port,
         'qos': qos,
         'retained': retained,
-        'writeLogsToLocalStorage': writeLogsToLocalStorage
+        'writeLogsToLocalStorage': writeLogsToLocalStorage,
+        'debug': debug,
+        'initialDelaySecondsForPublishing': initialDelaySecondsForPublishing
       });
     }
   }

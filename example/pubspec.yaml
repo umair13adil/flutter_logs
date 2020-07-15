@@ -36,4 +36,4 @@ flutter:
   uses-material-design: true
 
   assets:
-     - m2mqtt_ca.crt
+     - assets/

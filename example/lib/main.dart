@@ -165,12 +165,14 @@ class _MyAppState extends State<MyApp> {
 
   void doSetupForMQTT() async {
     await FlutterLogs.initMQTT(
-        topic: "YOUR_TOPIC",
+        topic: "",
         brokerUrl: "",
         //Add URL without schema
-        certificate: "m2mqtt_ca.crt",
+        certificate: "assets/m2mqtt_ca.crt",
         port: "8883",
-        writeLogsToLocalStorage: true);
+        writeLogsToLocalStorage: true,
+        debug: true,
+        initialDelaySecondsForPublishing: 10);
   }
 
   void logData({bool isException}) {

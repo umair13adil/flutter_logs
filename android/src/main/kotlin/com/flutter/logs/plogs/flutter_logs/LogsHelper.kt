@@ -188,7 +188,9 @@ object LogsHelper {
             clientId: String?,
             port: String?,
             qos: Int?,
-            retained: Boolean?
+            retained: Boolean?,
+            debug: Boolean?,
+            initialDelaySecondsForPublishing: Int?
 
     ) {
         if (!permissionsGranted(context)) {
@@ -205,7 +207,9 @@ object LogsHelper {
                     clientId = clientId ?: "",
                     port = port ?: "",
                     qos = qos ?: 0,
-                    retained = retained ?: false
+                    retained = retained ?: false,
+                    debug = debug ?: true,
+                    initialDelaySecondsForPublishing = initialDelaySecondsForPublishing?.toLong() ?: 30L
             )
         }
     }
