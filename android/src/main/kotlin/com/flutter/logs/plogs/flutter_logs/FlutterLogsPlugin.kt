@@ -26,8 +26,11 @@ import io.reactivex.schedulers.Schedulers
 class FlutterLogsPlugin : FlutterPlugin, ActivityAware, PluginRegistry.RequestPermissionsResultListener {
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
+        binaryMessenger = flutterPluginBinding.binaryMessenger
         Log.i(TAG, "onAttachedToEngine")
-        setUpPluginMethods(flutterPluginBinding.applicationContext, flutterPluginBinding.binaryMessenger)
+        if (areStoragePermissionsGranted()) {
+            setUpPluginMethods(flutterPluginBinding.applicationContext, flutterPluginBinding.binaryMessenger)
+        }
     }
 
     companion object {
@@ -35,7 +38,12 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware, PluginRegistry.RequestPe
         private var REQUEST_STORAGE_PERMISSIONS = 1212
         private var channel: MethodChannel? = null
         private var event_channel: EventChannel? = null
+
+        @JvmStatic
         private var currentActivity: Activity? = null
+
+        @JvmStatic
+        private var binaryMessenger: BinaryMessenger? = null
 
         @JvmStatic
         fun registerWith(registrar: PluginRegistry.Registrar) {
@@ -43,7 +51,10 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware, PluginRegistry.RequestPe
             val instance = FlutterLogsPlugin()
             registrar.addRequestPermissionsResultListener(instance)
             requestStoragePermission()
-            setUpPluginMethods(registrar.activity(), registrar.messenger())
+            binaryMessenger = registrar.messenger()
+            if (areStoragePermissionsGranted()) {
+                setUpPluginMethods(registrar.activity(), registrar.messenger())
+            }
         }
 
         @JvmStatic
@@ -427,6 +438,13 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware, PluginRegistry.RequestPe
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>?, grantResults: IntArray?): Boolean {
         if (requestCode == REQUEST_STORAGE_PERMISSIONS && grantResults?.isNotEmpty()!! && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+            binaryMessenger?.let { binaryMessenger ->
+                currentActivity?.let { currentActivity ->
+                    setUpPluginMethods(currentActivity, binaryMessenger)
+                }
+            }
+
             doIfPermissionsGranted()
             return true
         }
