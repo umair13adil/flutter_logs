@@ -28,9 +28,9 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware, PluginRegistry.RequestPe
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         binaryMessenger = flutterPluginBinding.binaryMessenger
         Log.i(TAG, "onAttachedToEngine")
-        if (areStoragePermissionsGranted()) {
-            setUpPluginMethods(flutterPluginBinding.applicationContext, flutterPluginBinding.binaryMessenger)
-        }
+        //if (areStoragePermissionsGranted()) {
+        setUpPluginMethods(flutterPluginBinding.applicationContext, flutterPluginBinding.binaryMessenger)
+        //}
     }
 
     companion object {
@@ -52,9 +52,9 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware, PluginRegistry.RequestPe
             registrar.addRequestPermissionsResultListener(instance)
             requestStoragePermission()
             binaryMessenger = registrar.messenger()
-            if (areStoragePermissionsGranted()) {
-                setUpPluginMethods(registrar.activity(), registrar.messenger())
-            }
+            //if (areStoragePermissionsGranted()) {
+            setUpPluginMethods(registrar.activity(), registrar.messenger())
+            //}
         }
 
         @JvmStatic
@@ -439,11 +439,11 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware, PluginRegistry.RequestPe
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>?, grantResults: IntArray?): Boolean {
         if (requestCode == REQUEST_STORAGE_PERMISSIONS && grantResults?.isNotEmpty()!! && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
-            binaryMessenger?.let { binaryMessenger ->
+            /*binaryMessenger?.let { binaryMessenger ->
                 currentActivity?.let { currentActivity ->
                     setUpPluginMethods(currentActivity, binaryMessenger)
                 }
-            }
+            }*/
 
             doIfPermissionsGranted()
             return true

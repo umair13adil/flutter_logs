@@ -45,40 +45,68 @@ object LogsHelper {
                     singleLogFileSize: Int?,
                     enabled: Boolean?) {
 
-        if (!permissionsGranted(context)) {
+        /*if (!permissionsGranted(context)) {
             Log.e(TAG, "setUpLogger: Unable to setup logs. Permissions not granted.")
             return
+        }*/
+
+        if (permissionsGranted(context)) {
+            createDir(savePath + File.separator + "Logs")
+
+            val config = LogsConfig(
+                    logLevelsEnabled = logLevelsEnabled,
+                    logTypesEnabled = logTypesEnabled,
+                    logsRetentionPeriodInDays = logsRetentionPeriodInDays ?: 7,
+                    zipsRetentionPeriodInDays = zipsRetentionPeriodInDays ?: 7,
+                    autoDeleteZipOnExport = autoDeleteZipOnExport ?: false,
+                    autoClearLogs = autoClearLogs ?: false,
+                    autoExportErrors = autoExportErrors ?: false,
+                    encryptionEnabled = encryptionEnabled ?: false,
+                    encryptionKey = encryptionKey ?: "",
+                    directoryStructure = getDirectoryStructure(directoryStructure),
+                    logSystemCrashes = logSystemCrashes ?: false,
+                    isDebuggable = isDebuggable ?: false,
+                    debugFileOperations = debugFileOperations ?: false,
+                    attachTimeStamp = attachTimeStamp ?: false,
+                    attachNoOfFiles = attachNoOfFiles ?: false,
+                    timeStampFormat = getTimeStampFormat(timeStampFormat),
+                    logFileExtension = getLogFileExtension(logFileExtension),
+                    zipFilesOnly = zipFilesOnly ?: false,
+                    savePath = createDir(savePath),
+                    zipFileName = zipFileName ?: "",
+                    exportPath = createDir(exportPath),
+                    singleLogFileSize = singleLogFileSize ?: 1,
+                    enabled = enabled ?: true
+            )
+
+            PLog.applyConfigurations(config, saveToFile = true, context = context)
+        } else {
+            val config = LogsConfig(
+                    logLevelsEnabled = logLevelsEnabled,
+                    logTypesEnabled = logTypesEnabled,
+                    logsRetentionPeriodInDays = logsRetentionPeriodInDays ?: 7,
+                    zipsRetentionPeriodInDays = zipsRetentionPeriodInDays ?: 7,
+                    autoDeleteZipOnExport = autoDeleteZipOnExport ?: false,
+                    autoClearLogs = autoClearLogs ?: false,
+                    autoExportErrors = autoExportErrors ?: false,
+                    encryptionEnabled = encryptionEnabled ?: false,
+                    encryptionKey = encryptionKey ?: "",
+                    directoryStructure = getDirectoryStructure(directoryStructure),
+                    logSystemCrashes = logSystemCrashes ?: false,
+                    isDebuggable = isDebuggable ?: false,
+                    debugFileOperations = debugFileOperations ?: false,
+                    attachTimeStamp = attachTimeStamp ?: false,
+                    attachNoOfFiles = attachNoOfFiles ?: false,
+                    timeStampFormat = getTimeStampFormat(timeStampFormat),
+                    logFileExtension = getLogFileExtension(logFileExtension),
+                    zipFilesOnly = zipFilesOnly ?: false,
+                    zipFileName = zipFileName ?: "",
+                    singleLogFileSize = singleLogFileSize ?: 1,
+                    enabled = enabled ?: true
+            )
+
+            PLog.applyConfigurations(config, context = context)
         }
-
-        createDir(savePath + File.separator + "Logs")
-
-        val config = LogsConfig(
-                logLevelsEnabled = logLevelsEnabled,
-                logTypesEnabled = logTypesEnabled,
-                logsRetentionPeriodInDays = logsRetentionPeriodInDays ?: 7,
-                zipsRetentionPeriodInDays = zipsRetentionPeriodInDays ?: 7,
-                autoDeleteZipOnExport = autoDeleteZipOnExport ?: false,
-                autoClearLogs = autoClearLogs ?: false,
-                autoExportErrors = autoExportErrors ?: false,
-                encryptionEnabled = encryptionEnabled ?: false,
-                encryptionKey = encryptionKey ?: "",
-                directoryStructure = getDirectoryStructure(directoryStructure),
-                logSystemCrashes = logSystemCrashes ?: false,
-                isDebuggable = isDebuggable ?: false,
-                debugFileOperations = debugFileOperations ?: false,
-                attachTimeStamp = attachTimeStamp ?: false,
-                attachNoOfFiles = attachNoOfFiles ?: false,
-                timeStampFormat = getTimeStampFormat(timeStampFormat),
-                logFileExtension = getLogFileExtension(logFileExtension),
-                zipFilesOnly = zipFilesOnly ?: false,
-                savePath = createDir(savePath),
-                zipFileName = zipFileName ?: "",
-                exportPath = createDir(exportPath),
-                singleLogFileSize = singleLogFileSize ?: 1,
-                enabled = enabled ?: true
-        )
-
-        PLog.applyConfigurations(config, saveToFile = true, context = context)
     }
 
     fun writeLogToFile(context: Context, type: String, data: String?, appendTimeStamp: Boolean) {
@@ -144,10 +172,10 @@ object LogsHelper {
                          labels: String?
     ) {
 
-        if (!permissionsGranted(context)) {
+        /*if (!permissionsGranted(context)) {
             Log.e(TAG, "setupForELKStack: Unable to setup logs. Permissions not granted.")
             return
-        }
+        }*/
 
         PLogMetaInfoProvider.elkStackSupported = true
 
@@ -193,10 +221,10 @@ object LogsHelper {
             initialDelaySecondsForPublishing: Int?
 
     ) {
-        if (!permissionsGranted(context)) {
+        /*if (!permissionsGranted(context)) {
             Log.e(TAG, "setMQTT: Unable to setup logs. Permissions not granted.")
             return
-        }
+        }*/
 
         if (brokerUrl.isNotEmpty()) {
             PLogMQTTProvider.initMQTTClient(context,
@@ -209,7 +237,8 @@ object LogsHelper {
                     qos = qos ?: 0,
                     retained = retained ?: false,
                     debug = debug ?: true,
-                    initialDelaySecondsForPublishing = initialDelaySecondsForPublishing?.toLong() ?: 30L
+                    initialDelaySecondsForPublishing = initialDelaySecondsForPublishing?.toLong()
+                            ?: 30L
             )
         }
     }
