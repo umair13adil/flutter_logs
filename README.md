@@ -32,7 +32,6 @@ Features
 - Multiple directory structures
 - Print logs as String
 - Export all or single types of logs
-- XML configuration support for internal persistence
 - ELK Stack Supported See more about it [here](https://www.elastic.co/what-is/elk-stack).
 - MQTT Support (SSL)
 

@@ -47,5 +47,5 @@ dependencies {
     implementation  'io.reactivex.rxjava2:rxkotlin:2.2.0'
 
     //PLogs
-    implementation "com.github.umair13adil:RxLogs:1.0.7"
+    implementation "com.github.umair13adil:RxLogs:1.0.14"
 }

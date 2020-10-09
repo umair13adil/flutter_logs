@@ -1,14 +1,9 @@
 package com.flutter.logs.plogs.flutter_logs
 
-import android.Manifest
 import android.app.Activity
 import android.content.Context
-import android.content.pm.PackageManager
-import android.os.Build
 import android.util.Log
 import androidx.annotation.NonNull
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import com.blackbox.plog.pLogs.PLog
 import com.blackbox.plog.pLogs.models.LogLevel
 import io.flutter.embedding.engine.plugins.FlutterPlugin
@@ -23,19 +18,15 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 
 
-class FlutterLogsPlugin : FlutterPlugin, ActivityAware, PluginRegistry.RequestPermissionsResultListener {
+class FlutterLogsPlugin : FlutterPlugin, ActivityAware {
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         binaryMessenger = flutterPluginBinding.binaryMessenger
-        Log.i(TAG, "onAttachedToEngine")
-        //if (areStoragePermissionsGranted()) {
         setUpPluginMethods(flutterPluginBinding.applicationContext, flutterPluginBinding.binaryMessenger)
-        //}
     }
 
     companion object {
         private val TAG = "FlutterLogsPlugin"
-        private var REQUEST_STORAGE_PERMISSIONS = 1212
         private var channel: MethodChannel? = null
         private var event_channel: EventChannel? = null
 
@@ -47,22 +38,15 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware, PluginRegistry.RequestPe
 
         @JvmStatic
         fun registerWith(registrar: PluginRegistry.Registrar) {
-            Log.i(TAG, "registerWith: FlutterLogsPlugin")
             val instance = FlutterLogsPlugin()
-            registrar.addRequestPermissionsResultListener(instance)
-            requestStoragePermission()
             binaryMessenger = registrar.messenger()
-            //if (areStoragePermissionsGranted()) {
             setUpPluginMethods(registrar.activity(), registrar.messenger())
-            //}
         }
 
         @JvmStatic
         private fun setUpPluginMethods(context: Context, messenger: BinaryMessenger) {
-            Log.i(TAG, "setUpPluginMethods")
-
+          
             channel = MethodChannel(messenger, "flutter_logs")
-            notifyIfPermissionsGranted(context)
 
             channel?.setMethodCallHandler { call, result ->
                 when (call.method) {
@@ -364,90 +348,27 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware, PluginRegistry.RequestPe
                 }
             })
         }
-
-        @JvmStatic
-        private fun notifyIfPermissionsGranted(context: Context) {
-            if (LogsHelper.permissionsGranted(context)) {
-                doIfPermissionsGranted()
-            }
-        }
-
-        @JvmStatic
-        private fun doIfPermissionsGranted() {
-            channel?.let {
-                Log.i(TAG, "doIfPermissionsGranted: Send event.")
-                it.invokeMethod("storagePermissionsGranted", "")
-            }
-        }
-
-        @JvmStatic
-        private fun requestStoragePermission() {
-            if (!areStoragePermissionsGranted()) {
-                Log.i(TAG, "requestStoragePermission: Requesting storage permissions..")
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    currentActivity?.let {
-                        ActivityCompat.requestPermissions(it, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE), REQUEST_STORAGE_PERMISSIONS)
-                    }
-                            ?: Log.e(TAG, "requestStoragePermission: Unable to request storage permissions.")
-                } else {
-                    doIfPermissionsGranted()
-                }
-            } else {
-                doIfPermissionsGranted()
-            }
-        }
-
-        @JvmStatic
-        private fun areStoragePermissionsGranted(): Boolean {
-            currentActivity?.let {
-                return ContextCompat.checkSelfPermission(it, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
-                        && ContextCompat.checkSelfPermission(it, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
-            }
-            return false
-        }
+        
     }
 
     override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
         currentActivity = null
-        Log.i(TAG, "onDetachedFromEngine")
         channel?.setMethodCallHandler(null)
         event_channel?.setStreamHandler(null)
     }
 
     override fun onAttachedToActivity(activityPluginBinding: ActivityPluginBinding) {
-        Log.i(TAG, "onAttachedToActivity")
         currentActivity = activityPluginBinding.activity
-        activityPluginBinding.addRequestPermissionsResultListener(this)
-        requestStoragePermission()
     }
 
     override fun onDetachedFromActivityForConfigChanges() {
-        Log.i(TAG, "onDetachedFromActivityForConfigChanges")
     }
 
     override fun onReattachedToActivityForConfigChanges(activityPluginBinding: ActivityPluginBinding) {
-        Log.i(TAG, "onReattachedToActivityForConfigChanges")
         currentActivity = activityPluginBinding.activity
-        activityPluginBinding.addRequestPermissionsResultListener(this)
     }
 
     override fun onDetachedFromActivity() {
-        Log.i(TAG, "onDetachedFromActivity")
         currentActivity = null
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>?, grantResults: IntArray?): Boolean {
-        if (requestCode == REQUEST_STORAGE_PERMISSIONS && grantResults?.isNotEmpty()!! && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-            /*binaryMessenger?.let { binaryMessenger ->
-                currentActivity?.let { currentActivity ->
-                    setUpPluginMethods(currentActivity, binaryMessenger)
-                }
-            }*/
-
-            doIfPermissionsGranted()
-            return true
-        }
-        return false
     }
 }

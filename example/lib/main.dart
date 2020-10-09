@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_logs/flutter_logs.dart';
 
@@ -19,7 +17,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    setUpLogsIfPermissionsGranted();
+    setUpLogs();
   }
 
   @override
@@ -42,8 +40,8 @@ class _MyAppState extends State<MyApp> {
               RaisedButton(
                 onPressed: () async {
                   setUpLogs();
-                  doSetupForELKSchema();
-                  doSetupForMQTT();
+                  //doSetupForELKSchema();
+                  //doSetupForMQTT();
                 },
                 child: Text('Setup Logs', style: TextStyle(fontSize: 20)),
               ),
@@ -100,21 +98,6 @@ class _MyAppState extends State<MyApp> {
         ),
       ),
     );
-  }
-
-  void setUpLogsIfPermissionsGranted() async {
-    if (Platform.isAndroid) {
-      FlutterLogs.channel.setMethodCallHandler((call) async {
-        if (call.method == 'storagePermissionsGranted') {
-          print("setUpLogsIfPermissionsGranted: storagePermissionsGranted");
-          setUpLogs();
-          doSetupForELKSchema();
-          doSetupForMQTT();
-        } else if (call.method == 'logsExported') {
-          print("logsExported: ${call.arguments.toString()}");
-        }
-      });
-    }
   }
 
   void setUpLogs() async {
