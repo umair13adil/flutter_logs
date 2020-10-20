@@ -1,3 +1,7 @@
+## 2.0.7
+
+* Updated Error messages Format in case of Errors & Exception logs
+
 ## 2.0.6
 
 * Updated PLogs library version

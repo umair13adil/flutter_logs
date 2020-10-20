@@ -177,7 +177,7 @@ class FlutterLogs {
       await channel.invokeMethod('logThis', <String, dynamic>{
         'tag': tag,
         'subTag': subTag,
-        'logMessage': logMessage,
+        'logMessage': "$logMessage , Error: ${error.toString()}",
         'level': _getLogLevel(level),
         'e': exception.toString()
       });
@@ -185,9 +185,16 @@ class FlutterLogs {
       await channel.invokeMethod('logThis', <String, dynamic>{
         'tag': tag,
         'subTag': subTag,
-        'logMessage': logMessage,
+        'logMessage': "$logMessage , Error: ${error.toString()}",
         'level': _getLogLevel(level),
         'e': error.stackTrace.toString()
+      });
+    } else if (errorMessage != null && errorMessage.isNotEmpty) {
+      await channel.invokeMethod('logThis', <String, dynamic>{
+        'tag': tag,
+        'subTag': subTag,
+        'logMessage': "$logMessage , Error: $errorMessage",
+        'level': _getLogLevel(level)
       });
     } else {
       await channel.invokeMethod('logThis', <String, dynamic>{
