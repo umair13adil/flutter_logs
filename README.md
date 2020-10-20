@@ -1,4 +1,4 @@
-# flutter_logs
+# flutter_logs 2.0.6
 #### A file based advanced logging framework for Flutter Apps (Android).
 ##### iOS Support comming soon.
 
@@ -23,7 +23,7 @@ Features
 - Logs events in files created separately every hour (24 hours event based)
 - Files can be compressed and exported for time and day filters
 - Clear Logs easily
-- Save & Export Logs to custom path as zip file
+- Save & Export Logs to app's directory as zip file
 - Custom Log formatting options
 - CSV support
 - Custom timestamps support
@@ -40,7 +40,7 @@ In your pubspec.yaml
 
 ```yaml
 dependencies:
-  flutter_logs: [LATEST_VERSION]
+    flutter_logs: 2.0.6
 ```
 
 ```dart
@@ -49,33 +49,47 @@ import 'package:flutter_logs/flutter_logs.dart';
 
 ## Setting Up
 
-#### Init Logs
+#### Initialization
 _______________________________________________
 
+In your main.dart file add like this:
+
 ```dart
-    await FlutterLogs.initLogs(
-        logLevelsEnabled: [
-          LogLevel.INFO,
-          LogLevel.WARNING,
-          LogLevel.ERROR,
-          LogLevel.SEVERE
-        ],
-        timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
-        directoryStructure: DirectoryStructure.FOR_DATE,
-        logTypesEnabled: [_my_log_file_name],
-        logFileExtension: LogFileExtension.LOG,
-        logsWriteDirectoryName: "MyLogs",
-        logsExportDirectoryName: "MyLogs/Exported",
-        debugFileOperations: true,
-        isDebuggable: true);
+   
+   import 'package:flutter_logs/flutter_logs.dart';
+
+   Future<void> main() async {
+     WidgetsFlutterBinding.ensureInitialized();
+
+     //Initialize Logging
+     await FlutterLogs.initLogs(
+     logLevelsEnabled: [
+       LogLevel.INFO,
+       LogLevel.WARNING,
+       LogLevel.ERROR,
+       LogLevel.SEVERE
+     ],
+     timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
+     directoryStructure: DirectoryStructure.FOR_DATE,
+     logTypesEnabled: ["device","network","errors"],
+     logFileExtension: LogFileExtension.LOG,
+     logsWriteDirectoryName: "MyLogs",
+     logsExportDirectoryName: "MyLogs/Exported",
+     debugFileOperations: true,
+     isDebuggable: true);
+
+     runApp(MyApp());
+   }
 ```
 
-## How it works?
+## How to log data?
+
+You have 2 choices for logging:
 
 Hourly Logs
 -----------
 
-Hourly logs are autumatically generated once this line is called:
+Hourly logs are autumatically generated once this line is called. These logs are sorted and named according to current time (24h format) on device e.g. 0110202013.log 
 
 ```dart
 FlutterLogs.logThis(
@@ -89,19 +103,21 @@ FlutterLogs.logThis(
 This will create a new file in storage directory according to time on device. For a single date, all logs will be present in a single directory.
 
 Custom File Logs
-----------------
+-------------------
 
 If you want to log data into a specific file for some events, you can do this in 2 steps:
 
-#### Step 1: 
-Define log file name in logs configuration:
+These logs will be kept in a seperate file.
 
+#### Step 1: 
+[IMPORTANT] Define log file name in logs configuration, logger needs the name to find the file on storage, otherwise no data will be logged.
+
+ Here 3 files of logs are defined, logger will use these file name as keys to write data in them.      
+ 
 ```dart
     await FlutterLogs.initLogs(
         logTypesEnabled: ["Locations","Jobs","API"]);
  ```
-
- Here 3 files of logs are defined, logger will use these file name as keys to write data in them.      
 
 #### Step 2: 
 Log data to file. You can choose to either append to file or overwrite to complete file.
@@ -113,6 +129,16 @@ Log data to file. You can choose to either append to file or overwrite to comple
         logMessage:
             "{0.0,0.0}");
  ```
+ 
+Where are my logs stored?
+ ------------------------------
+ 
+ Your logs can be found in the path of your app's directory in storage:
+ 
+*--> Android/data/[YOUR_APP_PACKAGE]/files/[YOUR_LOGS_FOLDER_NAME]/Logs/*
+ 
+ ![Image2](pictures/picture2.png)
+ 
 
 Export/Print Logs
 -----------------
