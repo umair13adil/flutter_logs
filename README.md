@@ -1,4 +1,4 @@
-# flutter_logs 2.0.6
+# flutter_logs
 #### A file based advanced logging framework for Flutter Apps (Android).
 ##### iOS Support comming soon.
 
@@ -40,7 +40,7 @@ In your pubspec.yaml
 
 ```yaml
 dependencies:
-    flutter_logs: 2.0.6
+    flutter_logs: [Latest_Version]
 ```
 
 ```dart

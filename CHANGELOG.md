@@ -1,4 +1,4 @@
-## 2.0.7
+## 2.1.0
 
 * Updated Error messages Format in case of Errors & Exception logs
 
