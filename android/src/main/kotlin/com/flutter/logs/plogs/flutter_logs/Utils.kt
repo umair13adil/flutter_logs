@@ -1,6 +1,5 @@
 package com.flutter.logs.plogs.flutter_logs
 
-import android.util.Log
 import com.blackbox.plog.pLogs.exporter.ExportType
 import com.blackbox.plog.pLogs.formatter.TimeStampFormat
 import com.blackbox.plog.pLogs.models.LogExtension
@@ -8,8 +7,8 @@ import com.blackbox.plog.pLogs.models.LogLevel
 import com.blackbox.plog.pLogs.structure.DirectoryStructure
 import io.flutter.plugin.common.MethodCall
 import java.io.ByteArrayInputStream
+import java.io.File
 import java.io.InputStream
-import java.sql.Time
 
 fun getLogLevelsById(key: String, call: MethodCall): ArrayList<LogLevel> {
     val listOfLogLevels = arrayListOf<LogLevel>()
@@ -162,4 +161,9 @@ fun getTimeStampFormat(type: String?): String {
         }
     }
     return TimeStampFormat.TIME_FORMAT_24_FULL
+}
+
+fun getParentPath(path: String): String {
+    val parentFile = File(path)
+    return "${LogsHelper.savePathProvided}${File.separator}${LogsHelper.exportPathProvided}${File.separator}${parentFile.name}"
 }

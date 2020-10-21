@@ -1,5 +1,9 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_logs/flutter_logs.dart';
+import 'package:path_provider/path_provider.dart';
 
 void main() {
   runApp(MyApp());
@@ -11,8 +15,10 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  var TAG = "MyApp";
   var _my_log_file_name = "MyLogFile";
   var toggle = false;
+  static Completer _completer = new Completer<String>();
 
   @override
   void initState() {
@@ -20,9 +26,40 @@ class _MyAppState extends State<MyApp> {
     setUpLogs();
   }
 
-  @override
-  void dispose() {
-    super.dispose();
+  void setUpLogs() async {
+    await FlutterLogs.initLogs(
+        logLevelsEnabled: [
+          LogLevel.INFO,
+          LogLevel.WARNING,
+          LogLevel.ERROR,
+          LogLevel.SEVERE
+        ],
+        timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
+        directoryStructure: DirectoryStructure.FOR_DATE,
+        logTypesEnabled: [_my_log_file_name],
+        logFileExtension: LogFileExtension.LOG,
+        logsWriteDirectoryName: "MyLogs",
+        logsExportDirectoryName: "MyLogs/Exported",
+        debugFileOperations: true,
+        isDebuggable: true);
+
+    // [IMPORTANT] The first log line must never be called before 'FlutterLogs.initLogs'
+    FlutterLogs.logInfo(TAG, "setUpLogs", "setUpLogs: Setting up logs..");
+
+    // Logs Exported Callback
+    FlutterLogs.channel.setMethodCallHandler((call) async {
+      if (call.method == 'logsExported') {
+        // Contains file name of zip
+        FlutterLogs.logInfo(
+            TAG, "setUpLogs", "logsExported: ${call.arguments.toString()}");
+
+        // Notify Future with value
+        _completer.complete(call.arguments.toString());
+      } else if (call.method == 'logsPrinted') {
+        FlutterLogs.logInfo(
+            TAG, "setUpLogs", "logsPrinted: ${call.arguments.toString()}");
+      }
+    });
   }
 
   @override
@@ -37,14 +74,6 @@ class _MyAppState extends State<MyApp> {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              RaisedButton(
-                onPressed: () async {
-                  setUpLogs();
-                  //doSetupForELKSchema();
-                  //doSetupForMQTT();
-                },
-                child: Text('Setup Logs', style: TextStyle(fontSize: 20)),
-              ),
               RaisedButton(
                 onPressed: () async {
                   logData(isException: false);
@@ -71,7 +100,24 @@ class _MyAppState extends State<MyApp> {
               ),
               RaisedButton(
                 onPressed: () async {
-                  exportAllLogs();
+                  // Export and then get File Reference
+                  await exportAllLogs().then((value) async {
+                    Directory externalDirectory =
+                        await getExternalStorageDirectory();
+
+                    File file = File("${externalDirectory.path}/$value");
+
+                    FlutterLogs.logInfo(
+                        TAG, "path", 'Path: \n${file.path.toString()}');
+
+                    if (file.existsSync()) {
+                      FlutterLogs.logInfo(
+                          TAG, "existsSync", 'Logs found and ready to export!');
+                    } else {
+                      FlutterLogs.logError(
+                          TAG, "existsSync", "File not found in storage.");
+                    }
+                  });
                 },
                 child: Text('Export All Logs', style: TextStyle(fontSize: 20)),
               ),
@@ -98,25 +144,6 @@ class _MyAppState extends State<MyApp> {
         ),
       ),
     );
-  }
-
-  void setUpLogs() async {
-    print("setUpLogs: Setting up logs..");
-    await FlutterLogs.initLogs(
-        logLevelsEnabled: [
-          LogLevel.INFO,
-          LogLevel.WARNING,
-          LogLevel.ERROR,
-          LogLevel.SEVERE
-        ],
-        timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
-        directoryStructure: DirectoryStructure.FOR_DATE,
-        logTypesEnabled: [_my_log_file_name],
-        logFileExtension: LogFileExtension.LOG,
-        logsWriteDirectoryName: "MyLogs",
-        logsExportDirectoryName: "MyLogs/Exported",
-        debugFileOperations: true,
-        isDebuggable: true);
   }
 
   void doSetupForELKSchema() async {
@@ -161,7 +188,7 @@ class _MyAppState extends State<MyApp> {
   void logData({bool isException}) {
     if (!isException) {
       FlutterLogs.logThis(
-          tag: 'MyApp',
+          tag: TAG,
           subTag: 'logData',
           logMessage:
               'This is a log message: ${DateTime.now().millisecondsSinceEpoch}',
@@ -180,14 +207,14 @@ class _MyAppState extends State<MyApp> {
       } catch (e) {
         if (e is Error) {
           FlutterLogs.logThis(
-              tag: 'MyApp',
+              tag: TAG,
               subTag: 'Caught an error.',
               logMessage: 'Caught an exception!',
               error: e,
               level: LogLevel.ERROR);
         } else {
           FlutterLogs.logThis(
-              tag: 'MyApp',
+              tag: TAG,
               subTag: 'Caught an exception.',
               logMessage: 'Caught an exception!',
               exception: e,
@@ -212,9 +239,9 @@ class _MyAppState extends State<MyApp> {
         exportType: ExportType.ALL, decryptBeforeExporting: true);
   }
 
-  void exportAllLogs() {
-    FlutterLogs.exportLogs(
-        exportType: ExportType.ALL, decryptBeforeExporting: true);
+  Future<String> exportAllLogs() async {
+    FlutterLogs.exportLogs(exportType: ExportType.ALL);
+    return _completer.future;
   }
 
   void exportFileLogs() {

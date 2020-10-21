@@ -206,6 +206,43 @@ class FlutterLogs {
     }
   }
 
+  static void logInfo(String tag, String subTag, String logMessage) async {
+    await channel.invokeMethod('logThis', <String, dynamic>{
+      'tag': tag,
+      'subTag': subTag,
+      'logMessage': logMessage,
+      'level': _getLogLevel(LogLevel.INFO)
+    });
+  }
+
+  static void logWarn(String tag, String subTag, String logMessage) async {
+    await channel.invokeMethod('logThis', <String, dynamic>{
+      'tag': tag,
+      'subTag': subTag,
+      'logMessage': logMessage,
+      'level': _getLogLevel(LogLevel.WARNING)
+    });
+  }
+
+  static void logError(String tag, String subTag, String logMessage) async {
+    await channel.invokeMethod('logThis', <String, dynamic>{
+      'tag': tag,
+      'subTag': subTag,
+      'logMessage': logMessage,
+      'level': _getLogLevel(LogLevel.ERROR)
+    });
+  }
+
+  static void logErrorTrace(String tag, String subTag, String logMessage, Error e) async {
+    await channel.invokeMethod('logThis', <String, dynamic>{
+      'tag': tag,
+      'subTag': subTag,
+      'logMessage': logMessage,
+      'e': e.stackTrace.toString(),
+      'level': _getLogLevel(LogLevel.ERROR)
+    });
+  }
+
   static void logToFile(
       {String logFileName = "",
       bool overwrite = false,

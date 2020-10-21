@@ -100,6 +100,18 @@ FlutterLogs.logThis(
         level: LogLevel.INFO);
 ```
 
+Or simply call this:
+
+```dart
+    FlutterLogs.logInfo("TAG", "subTag", "My Log Message");
+    
+    FlutterLogs.logWarn("TAG", "subTag", "My Log Message");
+    
+    FlutterLogs.logError("TAG", "subTag", "My Log Message");
+    
+    FlutterLogs.logErrorTrace("TAG", "subTag", "My Log Message", Error());
+```
+
 This will create a new file in storage directory according to time on device. For a single date, all logs will be present in a single directory.
 
 Custom File Logs
@@ -141,7 +153,7 @@ Where are my logs stored?
  
 
 Export/Print Logs
------------------
+---------------------
 
 You can export logs to output path sepcified in logs configuration:
 
@@ -154,32 +166,57 @@ To export logs call this:
 
 ```dart
     FlutterLogs.exportLogs(
-        exportType: ExportType.ALL, decryptBeforeExporting: true);
+        exportType: ExportType.ALL);
 ```
 
 ```dart
     FlutterLogs.printLogs(
-        exportType: ExportType.ALL, decryptBeforeExporting: true);
+        exportType: ExportType.ALL);
 ```
 
 To export custom file logs:
 
 ```dart
  FlutterLogs.exportFileLogForName(
-        logFileName: "Locations", decryptBeforeExporting: true);
+        logFileName: "Locations");
 ```
 
 ```dart
  FlutterLogs.printFileLogForName(
-        logFileName: "Locations", decryptBeforeExporting: true);
+        logFileName: "Locations");
 ```
 
-Listen to export/print results:
+### Listen to export/print results:
+-------------------------------------------
 
 ```dart
+    import 'dart:async';
+    import 'dart:io';
+    import 'package:flutter_logs/flutter_logs.dart';
+    import 'package:path_provider/path_provider.dart';
+
     FlutterLogs.channel.setMethodCallHandler((call) async {
         if (call.method == 'logsExported') {
-          print("logsExported: ${call.arguments.toString()}");
+          var zipName = "${call.arguments.toString()}";
+
+          Directory externalDirectory =
+              await getExternalStorageDirectory();
+
+          File file = File("${externalDirectory.path}/$zipName");
+
+          FlutterLogs.logInfo(
+              TAG, "path", 'Path: \n${file.path.toString()}');
+
+          if (file.existsSync()) {
+            FlutterLogs.logInfo(
+                TAG, "existsSync", 'Logs found and ready to export!');
+          } else {
+            FlutterLogs.logError(
+                TAG, "existsSync", "File not found in storage.");
+          }
+          
+        } else if (call.method == 'logsPrinted') {
+          //TODO Get results of logs print here
         }
       });
 ```

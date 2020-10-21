@@ -1,3 +1,8 @@
+## 2.1.1
+
+* Improved logs export flow
+* Added example for exporting logs in example app
+
 ## 2.1.0
 
 * Updated Error messages Format in case of Errors & Exception logs

@@ -15,6 +15,8 @@ import java.io.InputStream
 object LogsHelper {
 
     private val TAG = "LogsHelper"
+    var savePathProvided = ""
+    var exportPathProvided = ""
 
     fun setUpLogger(context: Context, logLevelsEnabled: ArrayList<LogLevel>,
                     logTypesEnabled: ArrayList<String>,
@@ -65,6 +67,14 @@ object LogsHelper {
                 singleLogFileSize = singleLogFileSize ?: 1,
                 enableLogsWriteToFile = enabled ?: true
         )
+
+        savePath?.let {
+            this.savePathProvided = it
+        }
+        
+        exportPath?.let {
+            this.exportPathProvided = it
+        }
 
         PLog.applyConfigurations(config, context = context)
     }
