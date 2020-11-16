@@ -50,7 +50,7 @@ public class SwiftFlutterLogsPlugin: NSObject, FlutterPlugin {
                let logMessage = myArgs["logMessage"] as? String,
                let appendTimeStamp = myArgs["appendTimeStamp"] as? Bool
             {
-                LogHelper.log(logMessage)
+                LogHelper.log(message: logMessage)
             } else {
                 result("iOS could not extract flutter arguments in method: (logToFile)")
             }

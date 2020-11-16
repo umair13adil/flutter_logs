@@ -17,6 +17,7 @@ class LogHelper: NSObject {
     }
     
     static func initLogs(){
+        print("initLogs")
         //Set the name of the log files
         Log.logger.name = "test" //default is "logfile"
         

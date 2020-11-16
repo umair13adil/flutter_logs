@@ -29,6 +29,21 @@ enum TimeStampFormat {
 enum ExportType { TODAY, LAST_HOUR, WEEKS, LAST_24_HOURS, ALL }
 
 class FlutterLogs {
+  // 0 = no messages, 1 = only errors, 2 = all
+  static int _debugLevel = 2;
+
+  /// Set the message level value [value] for debugging purpose. 0 = no messages, 1 = errors, 2 = all
+  static void setDebugLevel(int value) {
+    _debugLevel = value;
+  }
+
+  // Send the message [msg] with the [msgDebugLevel] value. 1 = error, 2 = info
+  static void printDebugMessage(String msg, int msgDebugLevel) {
+    if (_debugLevel >= msgDebugLevel) {
+      print('beacons_plugin: $msg');
+    }
+  }
+
   static const MethodChannel channel = const MethodChannel('flutter_logs');
 
   static Future<String> initLogs(
@@ -60,7 +75,8 @@ class FlutterLogs {
     var logFileExtensionString = _getLogFileExtension(logFileExtension);
     var logLevelsEnabledList = logLevelsEnabled.map((e) => _getLogLevel(e));
 
-    return await channel.invokeMethod('initLogs', <String, dynamic>{
+    final String result =
+        await channel.invokeMethod('initLogs', <String, dynamic>{
       'logLevelsEnabled': logLevelsEnabledList.join(','),
       'logTypesEnabled': logTypesEnabled.join(','),
       'logsRetentionPeriodInDays': logsRetentionPeriodInDays,
@@ -85,6 +101,8 @@ class FlutterLogs {
       'singleLogFileSize': singleLogFileSize,
       'enabled': enabled,
     });
+    printDebugMessage(result, 2);
+    return result;
   }
 
   static Future<String> initMQTT(
@@ -174,73 +192,90 @@ class FlutterLogs {
       Error error = null,
       String errorMessage = ""}) async {
     if (exception != null) {
-      await channel.invokeMethod('logThis', <String, dynamic>{
+      final String result =
+          await channel.invokeMethod('logThis', <String, dynamic>{
         'tag': tag,
         'subTag': subTag,
         'logMessage': "$logMessage , Error: ${error.toString()}",
         'level': _getLogLevel(level),
         'e': exception.toString()
       });
+      printDebugMessage(result, 2);
     } else if (error != null) {
-      await channel.invokeMethod('logThis', <String, dynamic>{
+      final String result =
+          await channel.invokeMethod('logThis', <String, dynamic>{
         'tag': tag,
         'subTag': subTag,
         'logMessage': "$logMessage , Error: ${error.toString()}",
         'level': _getLogLevel(level),
         'e': error.stackTrace.toString()
       });
+      printDebugMessage(result, 2);
     } else if (errorMessage != null && errorMessage.isNotEmpty) {
-      await channel.invokeMethod('logThis', <String, dynamic>{
+      final String result =
+          await channel.invokeMethod('logThis', <String, dynamic>{
         'tag': tag,
         'subTag': subTag,
         'logMessage': "$logMessage , Error: $errorMessage",
         'level': _getLogLevel(level)
       });
+      printDebugMessage(result, 2);
     } else {
-      await channel.invokeMethod('logThis', <String, dynamic>{
+      final String result =
+          await channel.invokeMethod('logThis', <String, dynamic>{
         'tag': tag,
         'subTag': subTag,
         'logMessage': logMessage,
         'level': _getLogLevel(level)
       });
+      printDebugMessage(result, 2);
     }
   }
 
   static void logInfo(String tag, String subTag, String logMessage) async {
-    await channel.invokeMethod('logThis', <String, dynamic>{
+    final String result =
+        await channel.invokeMethod('logThis', <String, dynamic>{
       'tag': tag,
       'subTag': subTag,
       'logMessage': logMessage,
       'level': _getLogLevel(LogLevel.INFO)
     });
+    printDebugMessage(result, 2);
   }
 
   static void logWarn(String tag, String subTag, String logMessage) async {
-    await channel.invokeMethod('logThis', <String, dynamic>{
+    final String result =
+        await channel.invokeMethod('logThis', <String, dynamic>{
       'tag': tag,
       'subTag': subTag,
       'logMessage': logMessage,
       'level': _getLogLevel(LogLevel.WARNING)
     });
+    printDebugMessage(result, 2);
   }
 
   static void logError(String tag, String subTag, String logMessage) async {
-    await channel.invokeMethod('logThis', <String, dynamic>{
+    final String result =
+        await channel.invokeMethod('logThis', <String, dynamic>{
       'tag': tag,
       'subTag': subTag,
       'logMessage': logMessage,
       'level': _getLogLevel(LogLevel.ERROR)
     });
+    printDebugMessage(result, 2);
   }
 
-  static void logErrorTrace(String tag, String subTag, String logMessage, Error e) async {
-    await channel.invokeMethod('logThis', <String, dynamic>{
+  static void logErrorTrace(
+      String tag, String subTag, String logMessage, Error e) async {
+    final String result =
+        await channel.invokeMethod('logThis', <String, dynamic>{
       'tag': tag,
       'subTag': subTag,
       'logMessage': logMessage,
       'e': e.stackTrace.toString(),
       'level': _getLogLevel(LogLevel.ERROR)
     });
+    printDebugMessage(result, 2);
   }
 
   static void logToFile(
@@ -249,12 +284,14 @@ class FlutterLogs {
       String logMessage = "",
       bool appendTimeStamp = false}) async {
     if (logFileName.isNotEmpty) {
-      await channel.invokeMethod('logToFile', <String, dynamic>{
+      final String result =
+          await channel.invokeMethod('logToFile', <String, dynamic>{
         'logFileName': logFileName,
         'overwrite': overwrite,
         'logMessage': logMessage,
         'appendTimeStamp': appendTimeStamp
       });
+      printDebugMessage(result, 2);
     } else {
       print("Error: \'logFileName\' required.");
     }
@@ -263,52 +300,62 @@ class FlutterLogs {
   static void exportLogs(
       {ExportType exportType = ExportType.ALL,
       bool decryptBeforeExporting = false}) async {
-    await channel.invokeMethod('exportLogs', <String, dynamic>{
+    final String result =
+        await channel.invokeMethod('exportLogs', <String, dynamic>{
       'exportType': _getExportType(exportType),
       'decryptBeforeExporting': decryptBeforeExporting
     });
+    printDebugMessage(result, 2);
   }
 
   static void printLogs(
       {ExportType exportType = ExportType.ALL,
       bool decryptBeforeExporting = false}) async {
-    await channel.invokeMethod('printLogs', <String, dynamic>{
+    final String result =
+        await channel.invokeMethod('printLogs', <String, dynamic>{
       'exportType': _getExportType(exportType),
       'decryptBeforeExporting': decryptBeforeExporting
     });
+    printDebugMessage(result, 2);
   }
 
   static void exportFileLogForName(
       {String logFileName = "", bool decryptBeforeExporting = false}) async {
     if (logFileName.isNotEmpty) {
-      await channel.invokeMethod('exportFileLogForName', <String, dynamic>{
+      final String result = await channel.invokeMethod(
+          'exportFileLogForName', <String, dynamic>{
         'logFileName': logFileName,
         'decryptBeforeExporting': decryptBeforeExporting
       });
+      printDebugMessage(result, 2);
     } else {
       print("Error: \'logFileName\' required.");
     }
   }
 
   static void exportAllFileLogs({bool decryptBeforeExporting = false}) async {
-    await channel.invokeMethod('exportAllFileLogs',
+    final String result = await channel.invokeMethod('exportAllFileLogs',
         <String, dynamic>{'decryptBeforeExporting': decryptBeforeExporting});
+    printDebugMessage(result, 2);
   }
 
   static void printFileLogForName(
       {String logFileName = "", bool decryptBeforeExporting = false}) async {
     if (logFileName.isNotEmpty) {
-      await channel.invokeMethod('printFileLogForName', <String, dynamic>{
+      final String result = await channel.invokeMethod(
+          'printFileLogForName', <String, dynamic>{
         'logFileName': logFileName,
         'decryptBeforeExporting': decryptBeforeExporting
       });
+      printDebugMessage(result, 2);
     } else {
       print("Error: \'logFileName\' required.");
     }
   }
 
   static void clearLogs() async {
-    await channel.invokeMethod('clearLogs');
+    final String result = await channel.invokeMethod('clearLogs');
+    printDebugMessage(result, 2);
   }
 
   static String _getDirectoryStructure(DirectoryStructure type) {
