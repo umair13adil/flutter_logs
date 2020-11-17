@@ -1,29 +1,31 @@
 import Flutter
 import UIKit
-import SwiftLog
 
 public class SwiftFlutterLogsPlugin: NSObject, FlutterPlugin {
     
     var eventSink: FlutterEventSink?
     
-    init(eventSink: FlutterEventSink?) {
+    func setEventSink(eventSink: FlutterEventSink?) {
         self.eventSink = eventSink
         //EventSendHelper.shared.setEventSink(eventSink: eventSink)
     }
     
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "flutter_logs", binaryMessenger: registrar.messenger())
+        let instance = SwiftFlutterLogsPlugin()
+        registrar.addMethodCallDelegate(instance, channel: channel)
         
         let eventChannel = FlutterEventChannel(name: "flutter_logs_plugin_stream", binaryMessenger: registrar.messenger())
         
-        let eventHandler = EventsStreamHandler(channel: channel, registrar: registrar)
+        let eventHandler = EventsStreamHandler(instance:instance, channel: channel, registrar: registrar)
         eventChannel.setStreamHandler(eventHandler)
     }
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         
+        
         if call.method == "initLogs" {
-            LogHelper.initLogs()
+            LogHelper.initLogs(result:result)
             result("Logs Configuration added.")
         }else if call.method == "logThis" {
             guard let args = call.arguments else {
@@ -36,7 +38,7 @@ public class SwiftFlutterLogsPlugin: NSObject, FlutterPlugin {
                let level = myArgs["level"] as? String,
                let exception = myArgs["e"] as? String
             {
-               
+                LogHelper.logThis(result:result,tag:tag, subTag:subTag,logMessage:logMessage,level:level,exception:exception)
             } else {
                 result("iOS could not extract flutter arguments in method: (logThis)")
             }
@@ -50,14 +52,17 @@ public class SwiftFlutterLogsPlugin: NSObject, FlutterPlugin {
                let logMessage = myArgs["logMessage"] as? String,
                let appendTimeStamp = myArgs["appendTimeStamp"] as? Bool
             {
-                LogHelper.log(message: logMessage)
+                LogHelper.logToFile(result:result,logFileName:logFileName, message: logMessage,overwrite:overwrite,appendTimeStamp:appendTimeStamp)
             } else {
                 result("iOS could not extract flutter arguments in method: (logToFile)")
             }
         }else if call.method == "exportLogs" {
-            
+            LogHelper.getFiles(result:result)
         }else if call.method == "exportFileLogForName" {
-           
+            
+        }else if call.method == "clearLogs" {
+            LogHelper.clearLogs()
+            result("Logs are cleared.")
         }
     }
 }
@@ -68,16 +73,18 @@ class EventsStreamHandler: NSObject, FlutterStreamHandler {
     
     private var fChannel:FlutterMethodChannel
     private var fRegistrar: FlutterPluginRegistrar?
+    var instance: SwiftFlutterLogsPlugin?
     
-    init(channel:FlutterMethodChannel,registrar: FlutterPluginRegistrar) {
+    init(instance: SwiftFlutterLogsPlugin?, channel:FlutterMethodChannel,registrar: FlutterPluginRegistrar) {
+        self.instance = instance
         self.fChannel = channel
         self.fRegistrar = registrar
     }
     
     public func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
         eventSink = events
-        let instance = SwiftFlutterLogsPlugin(eventSink: eventSink)
-        fRegistrar?.addMethodCallDelegate(instance, channel: fChannel)
+        instance?.setEventSink(eventSink: eventSink)
+        fRegistrar?.addMethodCallDelegate(instance!, channel: fChannel)
         return nil
     }
     
@@ -86,4 +93,3 @@ class EventsStreamHandler: NSObject, FlutterStreamHandler {
         return nil
     }
 }
-

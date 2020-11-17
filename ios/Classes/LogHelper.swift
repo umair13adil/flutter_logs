@@ -9,6 +9,8 @@ import SwiftLog
 
 class LogHelper: NSObject {
     
+    static var TAG = "LogHelper"
+    
     //MARK: constants
     static let sharedInstance = LogHelper()
     
@@ -16,7 +18,7 @@ class LogHelper: NSObject {
         return Log.logger.currentPath
     }
     
-    static func initLogs(){
+    static func initLogs(result: @escaping FlutterResult){
         print("initLogs")
         //Set the name of the log files
         Log.logger.name = "test" //default is "logfile"
@@ -34,18 +36,32 @@ class LogHelper: NSObject {
         Log.logger.printToConsole = true //default is true
     }
     
-    static func log(message:String){
-        print(message)
-        logw("write to the log!")
+    static func logToFile(result: @escaping FlutterResult, logFileName:String, message:String,
+                          overwrite:Bool, appendTimeStamp:Bool){
+        let log = "{\(logFileName)} {\(message)} {\(overwrite)} {\(getTimeStamp())}"
+        logw(log)
+        result(log)
     }
     
-    static func getFiles(){
+    static func logThis(result: @escaping FlutterResult,
+                        tag:String,
+                        subTag:String,
+                        logMessage:String,
+                        level:String,
+                        exception:String){
+        let log = "{\(tag)} {\(subTag)} {\(logMessage)} {\(level)} {\(getTimeStamp())}"
+        logw(log)
+        result(log)
+    }
+    
+    static func getFiles(result: @escaping FlutterResult){
         do {
             let files = try FileManager.default.contentsOfDirectory(atPath: Log.logger.directory)
             for fileName in files {
                 let path = "\(Log.logger.directory)/\(fileName)"
                 print(path)
             }
+            result("{\(TAG)} {getFiles} {Logs Fetched: \(files.count)} {\(getTimeStamp())}")
         } catch {
             //does nothing, because the file might not be there
         }
@@ -62,4 +78,14 @@ class LogHelper: NSObject {
             //does nothing, because the file might not be there
         }
     }
+    
+    static func getTimeStamp()->String{
+        let date = Date()
+        let dateFormatter = DateFormatter()
+        dateFormatter.timeZone = TimeZone(abbreviation: "GMT")
+        dateFormatter.locale = NSLocale.current
+        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        return dateFormatter.string(from: date)
+    }
+    
 }

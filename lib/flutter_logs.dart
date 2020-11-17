@@ -40,7 +40,7 @@ class FlutterLogs {
   // Send the message [msg] with the [msgDebugLevel] value. 1 = error, 2 = info
   static void printDebugMessage(String msg, int msgDebugLevel) {
     if (_debugLevel >= msgDebugLevel) {
-      print('beacons_plugin: $msg');
+      print('flutter_logs: $msg');
     }
   }
 
