@@ -2,6 +2,7 @@ name: flutter_logs
 description: An extensive filebased logging framework for flutter apps. (ELK Stack Supported)
 version: 2.1.2
 homepage: https://github.com/umair13adil/flutter_logs
+repository: https://github.com/umair13adil/flutter_logs
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
