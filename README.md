@@ -1,6 +1,5 @@
 # flutter_logs
-#### A file based advanced logging framework for Flutter Apps (Android).
-##### iOS Support comming soon.
+#### A file based advanced logging framework for Flutter Apps (Android & iOS).
 
 [![pub package](https://img.shields.io/pub/v/flutter_logs)](https://pub.dev/packages/flutter_logs)
 
@@ -17,8 +16,8 @@ Flutter logs can work with Logstash by writing JSON delimited logs to log files.
 
 [Sending logs from Flutter apps in real-time using ELK stack & MQTT](https://itnext.io/sending-logs-from-flutter-apps-in-real-time-using-elk-stack-mqtt-c24fa0cb9802)
 
-Features
---------
+Features (Android)
+---------------------
 
 - Logs events in files created separately every hour (24 hours event based)
 - Files can be compressed and exported for time and day filters
@@ -34,6 +33,17 @@ Features
 - Export all or single types of logs
 - ELK Stack Supported See more about it [here](https://www.elastic.co/what-is/elk-stack).
 - MQTT Support (SSL)
+
+Features (iOS)
+------------------
+
+##### *Note:* Work is in progress. More features will be added soon.
+
+- Logs events in files
+- Files can be compressed and exported
+- Clear Logs easily
+- Save & Export Logs to app's directory as zip file
+- Print logs as String
 
 ## Install
 In your pubspec.yaml
@@ -379,6 +389,7 @@ _______________________________________________
 ## Native Libraries
 
 * For Android: [RxLogs](https://github.com/umair13adil/RxLogs) 
+* For iOS [ZIPFoundation](https://github.com/weichsel/ZIPFoundation#zipping-files-and-directories)
 
 For more details about RxLogs visit this [Wiki](https://github.com/umair13adil/RxLogs/wiki)
 

@@ -65,21 +65,20 @@ class LogHelper: NSObject {
         result(log)
     }
     
-    static func getFiles(result: @escaping FlutterResult){
+    static func getFiles(result: @escaping FlutterResult,eventSink: FlutterEventSink?,channel : FlutterMethodChannel?){
         guard let files = Logging.fileURLs  else {
             result("{\(TAG)} {getFiles} {No Files found!} {\(getTimeStamp())}")
             return
         }
         
         if(!files.isEmpty){
-            result("{\(TAG)} {getFiles} {Logs Fetched: \(files.count)} {\(getTimeStamp())}")
-            zipLogs(result: result, zipName: "logs")
+            zipLogs(result: result, zipName: "logs",eventSink:eventSink, channel:channel)
         }else{
             result("{\(TAG)} {getFiles} {No Files found!} {\(getTimeStamp())}")
         }
     }
     
-    static func printLogs(result: @escaping FlutterResult){
+    static func printLogs(result: @escaping FlutterResult,eventSink: FlutterEventSink?,channel : FlutterMethodChannel?){
         
         guard let files = Logging.fileURLs  else {
             result("{\(TAG)} {printLogs} {No Files found!} {\(getTimeStamp())}")
@@ -93,6 +92,7 @@ class LogHelper: NSObject {
                 do {
                     let text2 = try String(contentsOf: fileURL, encoding: .utf8)
                     result("{\(TAG)} {printLogs} {Printed: \(text2)} {\(getTimeStamp())}")
+                    channel?.invokeMethod("logsPrinted", arguments: text2)
                 }
                 catch {
                     print(error)
@@ -145,7 +145,7 @@ class LogHelper: NSObject {
         return dateFormatter().string(from: Date())
     }
     
-    static func zipLogs(result: @escaping FlutterResult, zipName:String) {
+    static func zipLogs(result: @escaping FlutterResult, zipName:String,eventSink: FlutterEventSink?,channel : FlutterMethodChannel?) {
         
         let  path = NSSearchPathForDirectoriesInDomains(.documentDirectory,.userDomainMask,true).first!
         
@@ -188,6 +188,7 @@ class LogHelper: NSObject {
             print("{\(TAG)} {zipLogs} {Zip created: \(destinationURL.lastPathComponent)} {\(getTimeStamp())}")
             
             result(destinationURL.lastPathComponent)
+            channel?.invokeMethod("logsExported", arguments: "\(destinationURL.lastPathComponent)")
         } catch {
             print("{\(TAG)} {zipLogs} {No Files found!} {\(getTimeStamp())}")
             result("{\(TAG)} {zipLogs} {No Files found!} {\(getTimeStamp())}")

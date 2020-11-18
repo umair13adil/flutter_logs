@@ -1,3 +1,6 @@
+## 2.1.2
+* Added support for logging in iOS apps
+
 ## 2.1.1
 
 * Improved logs export flow

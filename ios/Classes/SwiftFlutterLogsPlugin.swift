@@ -4,14 +4,21 @@ import UIKit
 public class SwiftFlutterLogsPlugin: NSObject, FlutterPlugin {
     
     var eventSink: FlutterEventSink?
+    static var channel : FlutterMethodChannel?
     
     func setEventSink(eventSink: FlutterEventSink?) {
         self.eventSink = eventSink
-        //EventSendHelper.shared.setEventSink(eventSink: eventSink)
+    }
+    
+    static func setChannel(mChannel: FlutterMethodChannel?) {
+        channel = mChannel
     }
     
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "flutter_logs", binaryMessenger: registrar.messenger())
+        
+        setChannel(mChannel:channel)
+        
         let instance = SwiftFlutterLogsPlugin()
         registrar.addMethodCallDelegate(instance, channel: channel)
         
@@ -64,14 +71,14 @@ public class SwiftFlutterLogsPlugin: NSObject, FlutterPlugin {
                 result("iOS could not extract flutter arguments in method: (logToFile)")
             }
         }else if call.method == "exportLogs" {
-            LogHelper.getFiles(result:result)
+            LogHelper.getFiles(result:result,eventSink:eventSink, channel:SwiftFlutterLogsPlugin.channel)
         }else if call.method == "exportFileLogForName" {
             
         }else if call.method == "clearLogs" {
             LogHelper.clearLogs(result:result)
             result("Logs are cleared.")
         }else if call.method == "printLogs" {
-            LogHelper.printLogs(result:result)
+            LogHelper.printLogs(result:result,eventSink:eventSink, channel:SwiftFlutterLogsPlugin.channel)
         }
     }
 }
