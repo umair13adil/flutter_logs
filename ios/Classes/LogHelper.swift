@@ -5,6 +5,7 @@
 //
 
 import Foundation
+import ZIPFoundation
 
 class LogHelper: NSObject {
     
@@ -71,8 +72,8 @@ class LogHelper: NSObject {
         }
         
         if(!files.isEmpty){
-            
             result("{\(TAG)} {getFiles} {Logs Fetched: \(files.count)} {\(getTimeStamp())}")
+            zipLogs(result: result, zipName: "logs")
         }else{
             result("{\(TAG)} {getFiles} {No Files found!} {\(getTimeStamp())}")
         }
@@ -94,6 +95,7 @@ class LogHelper: NSObject {
                     result("{\(TAG)} {printLogs} {Printed: \(text2)} {\(getTimeStamp())}")
                 }
                 catch {
+                    print(error)
                     result("{\(TAG)} {printLogs} {Unable to read file. \(fileURL)} {\(getTimeStamp())}")
                 }
             }
@@ -115,6 +117,7 @@ class LogHelper: NSObject {
             }
             result("{\(TAG)} {clearLogs} {Logs Cleared!)} {\(getTimeStamp())}")
         } catch {
+            print(error)
             result("{\(TAG)} {clearLogs} {No Logs found! )} {\(getTimeStamp())}")
         }
     }
@@ -140,5 +143,54 @@ class LogHelper: NSObject {
     
     static func prefix() -> String {
         return dateFormatter().string(from: Date())
+    }
+    
+    static func zipLogs(result: @escaping FlutterResult, zipName:String) {
+        
+        let  path = NSSearchPathForDirectoriesInDomains(.documentDirectory,.userDomainMask,true).first!
+        
+        guard var sourceURL = Logging.defaultLogsDirectoryURL()  else {
+            print("{\(TAG)} {zipData} {Dir not found!} {\(getTimeStamp())}")
+            result("{\(TAG)} {zipData} {Dir not found!} {\(getTimeStamp())}")
+            return
+        }
+        
+        let zipName = "\(zipName)_\(getTimeStamp()).zip"
+        
+        var destinationURL = URL(fileURLWithPath: path)
+        destinationURL.appendPathComponent(zipName)
+        
+        do {
+            let fm = FileManager.default
+            let items = try fm.contentsOfDirectory(atPath: sourceURL.path)
+            
+            guard let archive = Archive(url: destinationURL, accessMode: .create) else  {
+                print("Unable to create an Archive!")
+                result("Unable to create an Archive!")
+                return
+            }
+            
+            for item in items {
+                print("Adding to Zip: \(item)")
+                sourceURL = sourceURL.appendingPathComponent("/\(item)")
+                
+                try archive.addEntry(with: sourceURL.lastPathComponent, relativeTo: sourceURL.deletingLastPathComponent())
+                
+                guard Archive(url: destinationURL, accessMode: .update) != nil else  {
+                    print("Unable to update the Archive!")
+                    result("Unable to update the Archive!")
+                    return
+                }
+                
+                sourceURL.deleteLastPathComponent()
+            }
+            
+            print("{\(TAG)} {zipLogs} {Zip created: \(destinationURL.lastPathComponent)} {\(getTimeStamp())}")
+            
+            result(destinationURL.lastPathComponent)
+        } catch {
+            print("{\(TAG)} {zipLogs} {No Files found!} {\(getTimeStamp())}")
+            result("{\(TAG)} {zipLogs} {No Files found!} {\(getTimeStamp())}")
+        }
     }
 }
