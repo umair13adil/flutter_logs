@@ -5,7 +5,6 @@
 //
 
 import Foundation
-import SwiftLog
 
 class LogHelper: NSObject {
     
@@ -14,32 +13,42 @@ class LogHelper: NSObject {
     //MARK: constants
     static let sharedInstance = LogHelper()
     
-    var logFilePath: String {
-        return Log.logger.currentPath
+    static var logFilePath: String {
+        return ""
     }
     
     static func initLogs(result: @escaping FlutterResult){
         print("initLogs")
-        //Set the name of the log files
-        Log.logger.name = "test" //default is "logfile"
         
-        //Set the max size of each log file. Value is in KB
-        Log.logger.maxFileSize = 2048 //default is 1024
-        
-        //Set the max number of logs files that will be kept
-        Log.logger.maxFileCount = 8 //default is 4
-        
-        //Set the directory in which the logs files will be written
-        Log.logger.directory = "/Library/somefolder" //default is the standard logging directory for each platform.
-        
-        //Set whether or not writing to the log also prints to the console
-        Log.logger.printToConsole = true //default is true
     }
     
     static func logToFile(result: @escaping FlutterResult, logFileName:String, message:String,
                           overwrite:Bool, appendTimeStamp:Bool){
-        let log = "{\(logFileName)} {\(message)} {\(overwrite)} {\(getTimeStamp())}"
-        logw(log)
+        let log = "{\(logFileName)} {\(message)} {\(overwrite)}"
+        
+        guard let dirURL = Logging.defaultLogsDirectoryURL() else {
+            print("Logs directory not found")
+            return
+        }
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "y-MM"
+        
+        let fileName = "\(logFileName)-\(dateFormatter.string(from: Date()))"
+        let fileURL = dirURL.appendingPathComponent(fileName).appendingPathExtension("txt")
+        let output = FileOutput(filePath: fileURL.path)
+        Logger.sharedInstance.addOutput(output)
+        
+        result(log)
+    }
+    
+    static func logThis(result: @escaping FlutterResult,
+                        tag:String,
+                        subTag:String,
+                        logMessage:String,
+                        level:String){
+        let log = "{\(tag)} {\(subTag)} {\(logMessage)} {\(level)}"
+        
+        Logger.sharedInstance.log(prefix() + ": " + log)
         result(log)
     }
     
@@ -49,33 +58,64 @@ class LogHelper: NSObject {
                         logMessage:String,
                         level:String,
                         exception:String){
-        let log = "{\(tag)} {\(subTag)} {\(logMessage)} {\(level)} {\(getTimeStamp())}"
-        logw(log)
+        let log = "{\(tag)} {\(subTag)} {\(logMessage)} {\(level)}"
+        
+        Logger.sharedInstance.log(prefix() + ": " + log)
         result(log)
     }
     
     static func getFiles(result: @escaping FlutterResult){
-        do {
-            let files = try FileManager.default.contentsOfDirectory(atPath: Log.logger.directory)
-            for fileName in files {
-                let path = "\(Log.logger.directory)/\(fileName)"
-                print(path)
-            }
+        guard let files = Logging.fileURLs  else {
+            result("{\(TAG)} {getFiles} {No Files found!} {\(getTimeStamp())}")
+            return
+        }
+        
+        if(!files.isEmpty){
+            
             result("{\(TAG)} {getFiles} {Logs Fetched: \(files.count)} {\(getTimeStamp())}")
-        } catch {
-            //does nothing, because the file might not be there
+        }else{
+            result("{\(TAG)} {getFiles} {No Files found!} {\(getTimeStamp())}")
         }
     }
     
-    static func clearLogs(){
-        do {
-            let files = try FileManager.default.contentsOfDirectory(atPath: Log.logger.directory)
-            for fileName in files {
-                let path = "\(Log.logger.directory)/\(fileName)"
-                try FileManager.default.removeItem(atPath: path)
+    static func printLogs(result: @escaping FlutterResult){
+        
+        guard let files = Logging.fileURLs  else {
+            result("{\(TAG)} {printLogs} {No Files found!} {\(getTimeStamp())}")
+            return
+        }
+        
+        if(!files.isEmpty){
+            
+            files.forEach { (fileURL) in
+                //reading
+                do {
+                    let text2 = try String(contentsOf: fileURL, encoding: .utf8)
+                    result("{\(TAG)} {printLogs} {Printed: \(text2)} {\(getTimeStamp())}")
+                }
+                catch {
+                    result("{\(TAG)} {printLogs} {Unable to read file. \(fileURL)} {\(getTimeStamp())}")
+                }
             }
+        }else{
+            result("{\(TAG)} {printLogs} {No Files found!} {\(getTimeStamp())}")
+        }
+    }
+    
+    static func clearLogs(result: @escaping FlutterResult){
+        let documentsUrl = Logging.defaultLogsDirectoryURL()
+        let fileManager = FileManager.default
+        do {
+            let directoryContents = try fileManager.contentsOfDirectory(at: documentsUrl!, includingPropertiesForKeys: nil)
+            
+            let files = directoryContents
+            
+            for url in files {
+                try fileManager.removeItem(at: url)
+            }
+            result("{\(TAG)} {clearLogs} {Logs Cleared!)} {\(getTimeStamp())}")
         } catch {
-            //does nothing, because the file might not be there
+            result("{\(TAG)} {clearLogs} {No Logs found! )} {\(getTimeStamp())}")
         }
     }
     
@@ -88,4 +128,17 @@ class LogHelper: NSObject {
         return dateFormatter.string(from: date)
     }
     
+    static var _dateFormatter: DateFormatter?
+    static func dateFormatter() -> DateFormatter {
+        if _dateFormatter == nil {
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "y-MM-dd HH:mm:ss.SSS Z"
+            _dateFormatter = dateFormatter
+        }
+        return _dateFormatter!
+    }
+    
+    static func prefix() -> String {
+        return dateFormatter().string(from: Date())
+    }
 }

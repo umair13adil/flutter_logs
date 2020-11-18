@@ -39,6 +39,13 @@ public class SwiftFlutterLogsPlugin: NSObject, FlutterPlugin {
                let exception = myArgs["e"] as? String
             {
                 LogHelper.logThis(result:result,tag:tag, subTag:subTag,logMessage:logMessage,level:level,exception:exception)
+            }else if let myArgs = args as? [String: Any],
+                     let tag = myArgs["tag"] as? String,
+                     let subTag = myArgs["subTag"] as? String,
+                     let logMessage = myArgs["logMessage"] as? String,
+                     let level = myArgs["level"] as? String
+            {
+                LogHelper.logThis(result:result,tag:tag, subTag:subTag,logMessage:logMessage,level:level)
             } else {
                 result("iOS could not extract flutter arguments in method: (logThis)")
             }
@@ -61,8 +68,10 @@ public class SwiftFlutterLogsPlugin: NSObject, FlutterPlugin {
         }else if call.method == "exportFileLogForName" {
             
         }else if call.method == "clearLogs" {
-            LogHelper.clearLogs()
+            LogHelper.clearLogs(result:result)
             result("Logs are cleared.")
+        }else if call.method == "printLogs" {
+            LogHelper.printLogs(result:result)
         }
     }
 }
