@@ -209,8 +209,15 @@ To export custom file logs:
         if (call.method == 'logsExported') {
           var zipName = "${call.arguments.toString()}";
 
-          Directory externalDirectory =
-              await getExternalStorageDirectory();
+            Directory externalDirectory;
+
+            if (Platform.isIOS) {
+              externalDirectory = await getApplicationDocumentsDirectory();
+            } else {
+              externalDirectory = await getExternalStorageDirectory();
+            }
+
+            FlutterLogs.logInfo(TAG, "found", 'External Storage:$externalDirectory');
 
           File file = File("${externalDirectory.path}/$zipName");
 

@@ -102,8 +102,16 @@ class _MyAppState extends State<MyApp> {
                 onPressed: () async {
                   // Export and then get File Reference
                   await exportAllLogs().then((value) async {
-                    Directory externalDirectory =
-                        await getExternalStorageDirectory();
+
+                    Directory externalDirectory;
+
+                    if (Platform.isIOS) {
+                      externalDirectory = await getApplicationDocumentsDirectory();
+                    } else {
+                      externalDirectory = await getExternalStorageDirectory();
+                    }
+
+                    FlutterLogs.logInfo(TAG, "found", 'External Storage:$externalDirectory');
 
                     File file = File("${externalDirectory.path}/$value");
 
