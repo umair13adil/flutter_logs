@@ -157,9 +157,17 @@ Where are my logs stored?
  
  Your logs can be found in the path of your app's directory in storage:
  
+ #### Android: 
+ 
 *--> Android/data/[YOUR_APP_PACKAGE]/files/[YOUR_LOGS_FOLDER_NAME]/Logs/*
  
  ![Image2](pictures/picture2.png)
+ 
+ #### iOS: 
+ 
+ *--> [YOUR_APP_CONTAINER]/AppData/Library/Application Support/Logs/*
+  
+  ![Image3](pictures/picture3.png)
  
 
 Export/Print Logs
