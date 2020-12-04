@@ -98,19 +98,10 @@ public class URLOutput: Output {
     
     
     private func getFileHandle() -> FileHandle? {
-        if fileHandle == nil {
-            let fileManager = FileManager.default
-            if !fileManager.fileExists(atPath: url.absoluteString) {
-                fileManager.createFile(atPath: url.absoluteString, contents: nil, attributes: nil)
-            }
-            
-            do {
-                fileHandle = try FileHandle(forWritingTo: url)
-            } catch let error {
-                Swift.print(error.localizedDescription)
-            }
+        if !FileManager.default.fileExists(atPath: url.absoluteString) {
+            FileManager.default.createFile(atPath: url.absoluteString, contents: nil, attributes: nil)
         }
-        
+        let fileHandle = FileHandle(forWritingAtPath: url.absoluteString)
         return fileHandle
     }
 }

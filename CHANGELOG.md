@@ -1,3 +1,6 @@
+## 2.1.3
+* Fixed file write issue on iOS Release Builds
+
 ## 2.1.2
 * Added support for logging in iOS apps
 
