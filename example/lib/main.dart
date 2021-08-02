@@ -102,18 +102,19 @@ class _MyAppState extends State<MyApp> {
                 onPressed: () async {
                   // Export and then get File Reference
                   await exportAllLogs().then((value) async {
-
-                    Directory externalDirectory;
+                    Directory? externalDirectory;
 
                     if (Platform.isIOS) {
-                      externalDirectory = await getApplicationDocumentsDirectory();
+                      externalDirectory =
+                          await getApplicationDocumentsDirectory();
                     } else {
                       externalDirectory = await getExternalStorageDirectory();
                     }
 
-                    FlutterLogs.logInfo(TAG, "found", 'External Storage:$externalDirectory');
+                    FlutterLogs.logInfo(
+                        TAG, "found", 'External Storage:$externalDirectory');
 
-                    File file = File("${externalDirectory.path}/$value");
+                    File file = File("${externalDirectory!.path}/$value");
 
                     FlutterLogs.logInfo(
                         TAG, "path", 'Path: \n${file.path.toString()}');
@@ -193,7 +194,7 @@ class _MyAppState extends State<MyApp> {
         initialDelaySecondsForPublishing: 10);
   }
 
-  void logData({bool isException}) {
+  void logData({required bool isException}) {
     if (!isException) {
       FlutterLogs.logThis(
           tag: TAG,
@@ -209,7 +210,7 @@ class _MyAppState extends State<MyApp> {
           print("$i");
         } else {
           toggle = true;
-          var i = null;
+          dynamic i;
           print(i * 10);
         }
       } catch (e) {
@@ -220,7 +221,7 @@ class _MyAppState extends State<MyApp> {
               logMessage: 'Caught an exception!',
               error: e,
               level: LogLevel.ERROR);
-        } else {
+        } else if (e is Exception) {
           FlutterLogs.logThis(
               tag: TAG,
               subTag: 'Caught an exception.',
@@ -249,7 +250,7 @@ class _MyAppState extends State<MyApp> {
 
   Future<String> exportAllLogs() async {
     FlutterLogs.exportLogs(exportType: ExportType.ALL);
-    return _completer.future;
+    return _completer.future as FutureOr<String>;
   }
 
   void exportFileLogs() {
