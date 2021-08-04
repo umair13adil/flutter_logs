@@ -38,7 +38,7 @@ class LogHelper: NSObject {
         let fileURL = dirURL.appendingPathComponent(fileName).appendingPathExtension("txt")
         let output = FileOutput(filePath: fileURL.path)
         Logger.sharedInstance.addOutput(output)
-        
+        Logger.sharedInstance.log(prefix() + ": " + log)
         result(log)
     }
     
@@ -49,6 +49,17 @@ class LogHelper: NSObject {
                         level:String){
         let log = "{\(tag)} {\(subTag)} {\(logMessage)} {\(level)}"
         
+        guard let dirURL = Logging.defaultLogsDirectoryURL() else {
+            print("Logs directory not found")
+            return
+        }
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "y-MM"
+        
+        let fileName = "Log-\(dateFormatter.string(from: Date()))"
+        let fileURL = dirURL.appendingPathComponent(fileName).appendingPathExtension("txt")
+        let output = FileOutput(filePath: fileURL.path)
+        Logger.sharedInstance.addOutput(output)
         Logger.sharedInstance.log(prefix() + ": " + log)
         result(log)
     }
@@ -60,7 +71,17 @@ class LogHelper: NSObject {
                         level:String,
                         exception:String){
         let log = "{\(tag)} {\(subTag)} {\(logMessage)} {\(level)}"
+        guard let dirURL = Logging.defaultLogsDirectoryURL() else {
+            print("Logs directory not found")
+            return
+        }
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "y-MM"
         
+        let fileName = "Log-\(dateFormatter.string(from: Date()))"
+        let fileURL = dirURL.appendingPathComponent(fileName).appendingPathExtension("txt")
+        let output = FileOutput(filePath: fileURL.path)
+        Logger.sharedInstance.addOutput(output)
         Logger.sharedInstance.log(prefix() + ": " + log)
         result(log)
     }
@@ -72,6 +93,11 @@ class LogHelper: NSObject {
         }
         
         if(!files.isEmpty){
+            
+            files.forEach { (fileURL) in
+                print(fileURL.absoluteURL)
+            }
+            
             zipLogs(result: result, zipName: "logs",eventSink:eventSink, channel:channel)
         }else{
             result("{\(TAG)} {getFiles} {No Files found!} {\(getTimeStamp())}")
@@ -113,8 +139,18 @@ class LogHelper: NSObject {
             let files = directoryContents
             
             for url in files {
+                print("{\(TAG)} {clearLogs} {Cleared: \(url.absoluteString) {\(getTimeStamp())}")
                 try fileManager.removeItem(at: url)
             }
+            
+//            let outputPath = NSSearchPathForDirectoriesInDomains(.documentDirectory,.userDomainMask,true)
+//
+//            for url in outputPath {
+//                let u = URL(fileURLWithPath: url)
+//                print("{\(TAG)} {clearLogs} {Cleared: \(u) {\(getTimeStamp())}")
+//                try fileManager.removeItem(at: u)
+//            }
+            
             result("{\(TAG)} {clearLogs} {Logs Cleared!)} {\(getTimeStamp())}")
         } catch {
             print(error)

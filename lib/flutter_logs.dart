@@ -38,7 +38,7 @@ class FlutterLogs {
   }
 
   // Send the message [msg] with the [msgDebugLevel] value. 1 = error, 2 = info
-  static void printDebugMessage(String msg, int msgDebugLevel) {
+  static void printDebugMessage(String? msg, int msgDebugLevel) {
     if (_debugLevel >= msgDebugLevel) {
       print('flutter_logs: $msg');
     }
@@ -46,9 +46,9 @@ class FlutterLogs {
 
   static const MethodChannel channel = const MethodChannel('flutter_logs');
 
-  static Future<String> initLogs(
-      {List<LogLevel> logLevelsEnabled,
-      List<String> logTypesEnabled,
+  static Future<String?> initLogs(
+      {required List<LogLevel> logLevelsEnabled,
+      required List<String> logTypesEnabled,
       int logsRetentionPeriodInDays = 14,
       int zipsRetentionPeriodInDays = 3,
       bool autoDeleteZipOnExport = false,
@@ -56,14 +56,14 @@ class FlutterLogs {
       bool autoExportErrors = true,
       bool encryptionEnabled = false,
       String encryptionKey = "",
-      DirectoryStructure directoryStructure,
+      DirectoryStructure? directoryStructure,
       bool logSystemCrashes = true,
       bool isDebuggable = true,
       bool debugFileOperations = true,
       bool attachTimeStamp = true,
       bool attachNoOfFiles = true,
-      TimeStampFormat timeStampFormat,
-      LogFileExtension logFileExtension,
+      TimeStampFormat? timeStampFormat,
+      LogFileExtension? logFileExtension,
       bool zipFilesOnly = false,
       String logsWriteDirectoryName = "",
       String logsExportZipFileName = "",
@@ -75,7 +75,7 @@ class FlutterLogs {
     var logFileExtensionString = _getLogFileExtension(logFileExtension);
     var logLevelsEnabledList = logLevelsEnabled.map((e) => _getLogLevel(e));
 
-    final String result =
+    final String? result =
         await channel.invokeMethod('initLogs', <String, dynamic>{
       'logLevelsEnabled': logLevelsEnabledList.join(','),
       'logTypesEnabled': logTypesEnabled.join(','),
@@ -105,7 +105,7 @@ class FlutterLogs {
     return result;
   }
 
-  static Future<String> initMQTT(
+  static Future<String?> initMQTT(
       {String topic = "",
       String brokerUrl = "",
       String certificate = "",
@@ -133,7 +133,7 @@ class FlutterLogs {
     }
   }
 
-  static Future<String> setMetaInfo({
+  static Future<String?> setMetaInfo({
     String appId = "",
     String appName = "",
     String appVersion = "",
@@ -188,11 +188,11 @@ class FlutterLogs {
       String subTag = "",
       String logMessage = "",
       LogLevel level = LogLevel.INFO,
-      Exception exception = null,
-      Error error = null,
+      Exception? exception = null,
+      Error? error = null,
       String errorMessage = ""}) async {
     if (exception != null) {
-      final String result =
+      final String? result =
           await channel.invokeMethod('logThis', <String, dynamic>{
         'tag': tag,
         'subTag': subTag,
@@ -202,7 +202,7 @@ class FlutterLogs {
       });
       printDebugMessage(result, 2);
     } else if (error != null) {
-      final String result =
+      final String? result =
           await channel.invokeMethod('logThis', <String, dynamic>{
         'tag': tag,
         'subTag': subTag,
@@ -212,7 +212,7 @@ class FlutterLogs {
       });
       printDebugMessage(result, 2);
     } else if (errorMessage != null && errorMessage.isNotEmpty) {
-      final String result =
+      final String? result =
           await channel.invokeMethod('logThis', <String, dynamic>{
         'tag': tag,
         'subTag': subTag,
@@ -221,7 +221,7 @@ class FlutterLogs {
       });
       printDebugMessage(result, 2);
     } else {
-      final String result =
+      final String? result =
           await channel.invokeMethod('logThis', <String, dynamic>{
         'tag': tag,
         'subTag': subTag,
@@ -233,7 +233,7 @@ class FlutterLogs {
   }
 
   static void logInfo(String tag, String subTag, String logMessage) async {
-    final String result =
+    final String? result =
         await channel.invokeMethod('logThis', <String, dynamic>{
       'tag': tag,
       'subTag': subTag,
@@ -244,7 +244,7 @@ class FlutterLogs {
   }
 
   static void logWarn(String tag, String subTag, String logMessage) async {
-    final String result =
+    final String? result =
         await channel.invokeMethod('logThis', <String, dynamic>{
       'tag': tag,
       'subTag': subTag,
@@ -255,7 +255,7 @@ class FlutterLogs {
   }
 
   static void logError(String tag, String subTag, String logMessage) async {
-    final String result =
+    final String? result =
         await channel.invokeMethod('logThis', <String, dynamic>{
       'tag': tag,
       'subTag': subTag,
@@ -267,7 +267,7 @@ class FlutterLogs {
 
   static void logErrorTrace(
       String tag, String subTag, String logMessage, Error e) async {
-    final String result =
+    final String? result =
         await channel.invokeMethod('logThis', <String, dynamic>{
       'tag': tag,
       'subTag': subTag,
@@ -284,7 +284,7 @@ class FlutterLogs {
       String logMessage = "",
       bool appendTimeStamp = false}) async {
     if (logFileName.isNotEmpty) {
-      final String result =
+      final String? result =
           await channel.invokeMethod('logToFile', <String, dynamic>{
         'logFileName': logFileName,
         'overwrite': overwrite,
@@ -300,7 +300,7 @@ class FlutterLogs {
   static void exportLogs(
       {ExportType exportType = ExportType.ALL,
       bool decryptBeforeExporting = false}) async {
-    final String result =
+    final String? result =
         await channel.invokeMethod('exportLogs', <String, dynamic>{
       'exportType': _getExportType(exportType),
       'decryptBeforeExporting': decryptBeforeExporting
@@ -311,7 +311,7 @@ class FlutterLogs {
   static void printLogs(
       {ExportType exportType = ExportType.ALL,
       bool decryptBeforeExporting = false}) async {
-    final String result =
+    final String? result =
         await channel.invokeMethod('printLogs', <String, dynamic>{
       'exportType': _getExportType(exportType),
       'decryptBeforeExporting': decryptBeforeExporting
@@ -322,7 +322,7 @@ class FlutterLogs {
   static void exportFileLogForName(
       {String logFileName = "", bool decryptBeforeExporting = false}) async {
     if (logFileName.isNotEmpty) {
-      final String result = await channel.invokeMethod(
+      final String? result = await channel.invokeMethod(
           'exportFileLogForName', <String, dynamic>{
         'logFileName': logFileName,
         'decryptBeforeExporting': decryptBeforeExporting
@@ -334,7 +334,7 @@ class FlutterLogs {
   }
 
   static void exportAllFileLogs({bool decryptBeforeExporting = false}) async {
-    final String result = await channel.invokeMethod('exportAllFileLogs',
+    final String? result = await channel.invokeMethod('exportAllFileLogs',
         <String, dynamic>{'decryptBeforeExporting': decryptBeforeExporting});
     printDebugMessage(result, 2);
   }
@@ -342,7 +342,7 @@ class FlutterLogs {
   static void printFileLogForName(
       {String logFileName = "", bool decryptBeforeExporting = false}) async {
     if (logFileName.isNotEmpty) {
-      final String result = await channel.invokeMethod(
+      final String? result = await channel.invokeMethod(
           'printFileLogForName', <String, dynamic>{
         'logFileName': logFileName,
         'decryptBeforeExporting': decryptBeforeExporting
@@ -354,15 +354,15 @@ class FlutterLogs {
   }
 
   static void clearLogs() async {
-    final String result = await channel.invokeMethod('clearLogs');
+    final String? result = await channel.invokeMethod('clearLogs');
     printDebugMessage(result, 2);
   }
 
-  static String _getDirectoryStructure(DirectoryStructure type) {
+  static String _getDirectoryStructure(DirectoryStructure? type) {
     return type.toString().split('.').last;
   }
 
-  static String _getLogFileExtension(LogFileExtension type) {
+  static String _getLogFileExtension(LogFileExtension? type) {
     return type.toString().split('.').last;
   }
 
@@ -374,7 +374,7 @@ class FlutterLogs {
     return type.toString().split('.').last;
   }
 
-  static String _getTimeStampFormat(TimeStampFormat type) {
+  static String _getTimeStampFormat(TimeStampFormat? type) {
     return type.toString().split('.').last;
   }
 

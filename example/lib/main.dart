@@ -16,7 +16,8 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   var TAG = "MyApp";
-  var _my_log_file_name = "MyLogFile";
+  var _log_file_1 = "Network";
+  var _log_file_2 = "Errors";
   var toggle = false;
   static Completer _completer = new Completer<String>();
 
@@ -36,7 +37,7 @@ class _MyAppState extends State<MyApp> {
         ],
         timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
         directoryStructure: DirectoryStructure.FOR_DATE,
-        logTypesEnabled: [_my_log_file_name],
+        logTypesEnabled: [_log_file_1, _log_file_2],
         logFileExtension: LogFileExtension.LOG,
         logsWriteDirectoryName: "MyLogs",
         logsExportDirectoryName: "MyLogs/Exported",
@@ -102,16 +103,17 @@ class _MyAppState extends State<MyApp> {
                 onPressed: () async {
                   // Export and then get File Reference
                   await exportAllLogs().then((value) async {
-
                     Directory externalDirectory;
 
                     if (Platform.isIOS) {
-                      externalDirectory = await getApplicationDocumentsDirectory();
+                      externalDirectory =
+                          await getApplicationDocumentsDirectory();
                     } else {
                       externalDirectory = await getExternalStorageDirectory();
                     }
 
-                    FlutterLogs.logInfo(TAG, "found", 'External Storage:$externalDirectory');
+                    FlutterLogs.logInfo(
+                        TAG, "found", 'External Storage:$externalDirectory');
 
                     File file = File("${externalDirectory.path}/$value");
 
@@ -233,12 +235,22 @@ class _MyAppState extends State<MyApp> {
   }
 
   void logToFile() {
+    var fileToLog = "";
+
+    if (toggle) {
+      fileToLog = _log_file_1;
+      toggle = false;
+    } else {
+      fileToLog = _log_file_2;
+      toggle = true;
+    }
+
     FlutterLogs.logToFile(
-        logFileName: _my_log_file_name,
+        logFileName: fileToLog,
         overwrite: false,
         //If set 'true' logger will append instead of overwriting
         logMessage:
-            "This is a log message: ${DateTime.now().millisecondsSinceEpoch}, it will be saved to my log file named: \'$_my_log_file_name\'",
+            "This is a log message: ${DateTime.now().millisecondsSinceEpoch}, it will be saved to my log file named: \'$fileToLog\'",
         appendTimeStamp: true); //Add time stamp at the end of log message
   }
 
@@ -254,11 +266,11 @@ class _MyAppState extends State<MyApp> {
 
   void exportFileLogs() {
     FlutterLogs.exportFileLogForName(
-        logFileName: _my_log_file_name, decryptBeforeExporting: true);
+        logFileName: _log_file_1, decryptBeforeExporting: true);
   }
 
   void printFileLogs() {
     FlutterLogs.printFileLogForName(
-        logFileName: _my_log_file_name, decryptBeforeExporting: true);
+        logFileName: _log_file_1, decryptBeforeExporting: true);
   }
 }

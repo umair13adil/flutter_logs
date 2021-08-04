@@ -56,15 +56,10 @@ public class FileOutput: Output {
     
     
     private func getFileHandle() -> FileHandle? {
-        if fileHandle == nil {
-            let fileManager = FileManager.default
-            if !fileManager.fileExists(atPath: filePath) {
-                fileManager.createFile(atPath: filePath, contents: nil, attributes: nil)
-            }
-            
-            fileHandle = FileHandle(forWritingAtPath: filePath)
+        if !FileManager.default.fileExists(atPath: filePath) {
+            FileManager.default.createFile(atPath: filePath, contents: nil, attributes: nil)
         }
-        
+        let fileHandle = FileHandle(forWritingAtPath: filePath)
         return fileHandle
     }
 }
