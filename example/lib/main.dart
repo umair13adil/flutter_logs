@@ -16,8 +16,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   var TAG = "MyApp";
-  var _log_file_1 = "Network";
-  var _log_file_2 = "Errors";
+  var _my_log_file_name = "MyLogFile";
   var toggle = false;
   static Completer _completer = new Completer<String>();
 
@@ -37,7 +36,7 @@ class _MyAppState extends State<MyApp> {
         ],
         timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
         directoryStructure: DirectoryStructure.FOR_DATE,
-        logTypesEnabled: [_log_file_1, _log_file_2],
+        logTypesEnabled: [_my_log_file_name],
         logFileExtension: LogFileExtension.LOG,
         logsWriteDirectoryName: "MyLogs",
         logsExportDirectoryName: "MyLogs/Exported",
@@ -103,7 +102,7 @@ class _MyAppState extends State<MyApp> {
                 onPressed: () async {
                   // Export and then get File Reference
                   await exportAllLogs().then((value) async {
-                    Directory externalDirectory;
+                    Directory? externalDirectory;
 
                     if (Platform.isIOS) {
                       externalDirectory =
@@ -115,7 +114,7 @@ class _MyAppState extends State<MyApp> {
                     FlutterLogs.logInfo(
                         TAG, "found", 'External Storage:$externalDirectory');
 
-                    File file = File("${externalDirectory.path}/$value");
+                    File file = File("${externalDirectory!.path}/$value");
 
                     FlutterLogs.logInfo(
                         TAG, "path", 'Path: \n${file.path.toString()}');
@@ -195,7 +194,7 @@ class _MyAppState extends State<MyApp> {
         initialDelaySecondsForPublishing: 10);
   }
 
-  void logData({bool isException}) {
+  void logData({required bool isException}) {
     if (!isException) {
       FlutterLogs.logThis(
           tag: TAG,
@@ -211,7 +210,7 @@ class _MyAppState extends State<MyApp> {
           print("$i");
         } else {
           toggle = true;
-          var i = null;
+          dynamic i;
           print(i * 10);
         }
       } catch (e) {
@@ -222,7 +221,7 @@ class _MyAppState extends State<MyApp> {
               logMessage: 'Caught an exception!',
               error: e,
               level: LogLevel.ERROR);
-        } else {
+        } else if (e is Exception) {
           FlutterLogs.logThis(
               tag: TAG,
               subTag: 'Caught an exception.',
@@ -235,22 +234,12 @@ class _MyAppState extends State<MyApp> {
   }
 
   void logToFile() {
-    var fileToLog = "";
-
-    if (toggle) {
-      fileToLog = _log_file_1;
-      toggle = false;
-    } else {
-      fileToLog = _log_file_2;
-      toggle = true;
-    }
-
     FlutterLogs.logToFile(
-        logFileName: fileToLog,
+        logFileName: _my_log_file_name,
         overwrite: false,
         //If set 'true' logger will append instead of overwriting
         logMessage:
-            "This is a log message: ${DateTime.now().millisecondsSinceEpoch}, it will be saved to my log file named: \'$fileToLog\'",
+            "This is a log message: ${DateTime.now().millisecondsSinceEpoch}, it will be saved to my log file named: \'$_my_log_file_name\'",
         appendTimeStamp: true); //Add time stamp at the end of log message
   }
 
@@ -261,16 +250,16 @@ class _MyAppState extends State<MyApp> {
 
   Future<String> exportAllLogs() async {
     FlutterLogs.exportLogs(exportType: ExportType.ALL);
-    return _completer.future;
+    return _completer.future as FutureOr<String>;
   }
 
   void exportFileLogs() {
     FlutterLogs.exportFileLogForName(
-        logFileName: _log_file_1, decryptBeforeExporting: true);
+        logFileName: _my_log_file_name, decryptBeforeExporting: true);
   }
 
   void printFileLogs() {
     FlutterLogs.printFileLogForName(
-        logFileName: _log_file_1, decryptBeforeExporting: true);
+        logFileName: _my_log_file_name, decryptBeforeExporting: true);
   }
 }
