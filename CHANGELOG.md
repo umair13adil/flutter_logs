@@ -1,3 +1,6 @@
+## 2.1.4
+* Null Safety Added
+
 ## 2.1.3
 * Fixed file write issue on iOS Release Builds
 
