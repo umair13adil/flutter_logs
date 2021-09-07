@@ -210,7 +210,7 @@ class LogHelper: NSObject {
                 print("Adding to Zip: \(item)")
                 sourceURL = sourceURL.appendingPathComponent("/\(item)")
                 
-                try archive.addEntry(with: sourceURL.lastPathComponent, relativeTo: sourceURL.deletingLastPathComponent())
+                try archive.addEntry(with: sourceURL.lastPathComponent, relativeTo: sourceURL.deletingLastPathComponent(), compressionMethod: CompressionMethod.deflate)
                 
                 guard Archive(url: destinationURL, accessMode: .update) != nil else  {
                     print("Unable to update the Archive!")
