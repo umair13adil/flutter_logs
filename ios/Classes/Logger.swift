@@ -114,7 +114,9 @@ public class Logger {
     }
     
     public func addOutput(_ output: Output) {
+        if (!outputs.contains(where: {type(of: $0) == type(of: output)})) {
         outputs.append(output)
+        }
     }
     
     public func log(_ string: String) {
