@@ -1,3 +1,7 @@
+## 2.1.5
+* Removed double logs printing
+* Updated RxLogs versions
+
 ## 2.1.4
 * Null Safety Added
 
