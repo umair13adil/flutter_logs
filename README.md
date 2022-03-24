@@ -99,7 +99,7 @@ You have 2 choices for logging:
 Hourly Logs
 -----------
 
-Hourly logs are autumatically generated once this line is called. These logs are sorted and named according to current time (24h format) on device e.g. 0110202013.log 
+Hourly logs are automatically generated once this line is called. These logs are sorted and named according to current time (24h format) on device e.g. 0110202013.log 
 
 ```dart
 FlutterLogs.logThis(
