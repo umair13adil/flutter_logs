@@ -156,6 +156,9 @@ fun getTimeStampFormat(type: String?): String {
         "TIME_FORMAT_READABLE" -> {
             return TimeStampFormat.TIME_FORMAT_READABLE
         }
+        "TIME_FORMAT_READABLE_2" -> {
+            return TimeStampFormat.TIME_FORMAT_READABLE_2
+        }
         "TIME_FORMAT_SIMPLE" -> {
             return TimeStampFormat.TIME_FORMAT_SIMPLE
         }
