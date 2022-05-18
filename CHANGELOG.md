@@ -1,3 +1,6 @@
+## 2.1.6
+* Added support for flutter 3 build
+
 ## 2.1.5
 * Removed double logs printing
 * Updated RxLogs versions
