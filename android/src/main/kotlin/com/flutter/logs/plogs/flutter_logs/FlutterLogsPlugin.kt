@@ -40,7 +40,7 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware {
         fun registerWith(registrar: PluginRegistry.Registrar) {
             val instance = FlutterLogsPlugin()
             binaryMessenger = registrar.messenger()
-            setUpPluginMethods(registrar.activity(), registrar.messenger())
+            registrar.activity()?.let { setUpPluginMethods(it, registrar.messenger()) }
         }
 
         @JvmStatic
