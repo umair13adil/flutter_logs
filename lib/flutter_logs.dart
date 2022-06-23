@@ -3,8 +3,11 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 
 enum DirectoryStructure { FOR_DATE, FOR_EVENT, SINGLE_FILE_FOR_DAY }
+
 enum LogFileExtension { TXT, CSV, LOG, NONE }
+
 enum LogLevel { INFO, WARNING, ERROR, SEVERE }
+
 enum LogType {
   Device,
   Location,
@@ -16,6 +19,7 @@ enum LogType {
   Jobs,
   Errors
 }
+
 enum TimeStampFormat {
   DATE_FORMAT_1,
   DATE_FORMAT_2,
@@ -27,6 +31,7 @@ enum TimeStampFormat {
   TIME_FORMAT_READABLE_2,
   TIME_FORMAT_SIMPLE
 }
+
 enum ExportType { TODAY, LAST_HOUR, WEEKS, LAST_24_HOURS, ALL }
 
 class FlutterLogs {
@@ -185,7 +190,7 @@ class FlutterLogs {
     });
   }
 
-  static void logThis(
+  static Future<void> logThis(
       {String tag = "",
       String subTag = "",
       String logMessage = "",
@@ -234,7 +239,8 @@ class FlutterLogs {
     }
   }
 
-  static void logInfo(String tag, String subTag, String logMessage) async {
+  static Future<void> logInfo(
+      String tag, String subTag, String logMessage) async {
     final String result =
         await channel.invokeMethod('logThis', <String, dynamic>{
       'tag': tag,
@@ -245,7 +251,8 @@ class FlutterLogs {
     printDebugMessage(result, 2);
   }
 
-  static void logWarn(String tag, String subTag, String logMessage) async {
+  static Future<void> logWarn(
+      String tag, String subTag, String logMessage) async {
     final String result =
         await channel.invokeMethod('logThis', <String, dynamic>{
       'tag': tag,
@@ -256,7 +263,8 @@ class FlutterLogs {
     printDebugMessage(result, 2);
   }
 
-  static void logError(String tag, String subTag, String logMessage) async {
+  static Future<void> logError(
+      String tag, String subTag, String logMessage) async {
     final String result =
         await channel.invokeMethod('logThis', <String, dynamic>{
       'tag': tag,
@@ -267,7 +275,7 @@ class FlutterLogs {
     printDebugMessage(result, 2);
   }
 
-  static void logErrorTrace(
+  static Future<void> logErrorTrace(
       String tag, String subTag, String logMessage, Error e) async {
     final String result =
         await channel.invokeMethod('logThis', <String, dynamic>{
@@ -280,7 +288,7 @@ class FlutterLogs {
     printDebugMessage(result, 2);
   }
 
-  static void logToFile(
+  static Future<void> logToFile(
       {String logFileName = "",
       bool overwrite = false,
       String logMessage = "",
@@ -299,7 +307,7 @@ class FlutterLogs {
     }
   }
 
-  static void exportLogs(
+  static Future<void> exportLogs(
       {ExportType exportType = ExportType.ALL,
       bool decryptBeforeExporting = false}) async {
     final String result =
@@ -310,7 +318,7 @@ class FlutterLogs {
     printDebugMessage(result, 2);
   }
 
-  static void printLogs(
+  static Future<void> printLogs(
       {ExportType exportType = ExportType.ALL,
       bool decryptBeforeExporting = false}) async {
     final String result =
@@ -321,7 +329,7 @@ class FlutterLogs {
     printDebugMessage(result, 2);
   }
 
-  static void exportFileLogForName(
+  static Future<void> exportFileLogForName(
       {String logFileName = "", bool decryptBeforeExporting = false}) async {
     if (logFileName.isNotEmpty) {
       final String result = await channel.invokeMethod(
@@ -335,13 +343,14 @@ class FlutterLogs {
     }
   }
 
-  static void exportAllFileLogs({bool decryptBeforeExporting = false}) async {
+  static Future<void> exportAllFileLogs(
+      {bool decryptBeforeExporting = false}) async {
     final String result = await channel.invokeMethod('exportAllFileLogs',
         <String, dynamic>{'decryptBeforeExporting': decryptBeforeExporting});
     printDebugMessage(result, 2);
   }
 
-  static void printFileLogForName(
+  static Future<void> printFileLogForName(
       {String logFileName = "", bool decryptBeforeExporting = false}) async {
     if (logFileName.isNotEmpty) {
       final String result = await channel.invokeMethod(
@@ -355,7 +364,7 @@ class FlutterLogs {
     }
   }
 
-  static void clearLogs() async {
+  static Future<void> clearLogs() async {
     final String result = await channel.invokeMethod('clearLogs');
     printDebugMessage(result, 2);
   }
