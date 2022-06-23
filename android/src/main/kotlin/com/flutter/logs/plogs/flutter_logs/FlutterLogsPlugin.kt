@@ -37,13 +37,6 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware {
         private var binaryMessenger: BinaryMessenger? = null
 
         @JvmStatic
-        fun registerWith(registrar: PluginRegistry.Registrar) {
-            val instance = FlutterLogsPlugin()
-            binaryMessenger = registrar.messenger()
-            registrar.activity()?.let { setUpPluginMethods(it, registrar.messenger()) }
-        }
-
-        @JvmStatic
         private fun setUpPluginMethods(context: Context, messenger: BinaryMessenger) {
           
             channel = MethodChannel(messenger, "flutter_logs")
@@ -155,7 +148,6 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware {
                         val labels = getStringValueById("labels", call)
 
                         LogsHelper.setupForELKStack(
-                                context = context,
                                 appId = appId,
                                 appName = appName,
                                 appVersion = appVersion,
@@ -176,8 +168,7 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware {
                                 deviceSdkInt = deviceSdkInt,
                                 deviceBatteryPercent = deviceBatteryPercent,
                                 latitude = latitude,
-                                longitude = longitude,
-                                labels = labels
+                                longitude = longitude
                         )
 
                         result.success("Logs MetaInfo added for ELK stack.")
@@ -221,9 +212,9 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware {
                         val appendTimeStamp = getBoolValueById("appendTimeStamp", call)
 
                         if (overwrite) {
-                            LogsHelper.overWriteLogToFile(context, logFileName, logMessage, appendTimeStamp)
+                            LogsHelper.overWriteLogToFile(logFileName, logMessage, appendTimeStamp)
                         } else {
-                            LogsHelper.writeLogToFile(context, logFileName, logMessage, appendTimeStamp)
+                            LogsHelper.writeLogToFile(logFileName, logMessage, appendTimeStamp)
                         }
                     }
                     "exportLogs" -> {

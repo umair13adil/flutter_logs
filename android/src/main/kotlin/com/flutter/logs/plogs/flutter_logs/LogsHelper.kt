@@ -79,7 +79,7 @@ object LogsHelper {
         PLog.applyConfigurations(config, context = context)
     }
 
-    fun writeLogToFile(context: Context, type: String, data: String?, appendTimeStamp: Boolean) {
+    fun writeLogToFile(type: String, data: String?, appendTimeStamp: Boolean) {
 
         try {
             if (appendTimeStamp) {
@@ -94,7 +94,7 @@ object LogsHelper {
         }
     }
 
-    fun overWriteLogToFile(context: Context, type: String, data: String?, appendTimeStamp: Boolean) {
+    fun overWriteLogToFile(type: String, data: String?, appendTimeStamp: Boolean) {
 
         try {
             if (appendTimeStamp) {
@@ -107,8 +107,7 @@ object LogsHelper {
         }
     }
 
-    fun setupForELKStack(context: Context,
-                         appId: String?,
+    fun setupForELKStack(appId: String?,
                          appName: String?,
                          appVersion: String?,
                          deviceId: String?,
@@ -128,8 +127,7 @@ object LogsHelper {
                          deviceSdkInt: String?,
                          deviceBatteryPercent: String?,
                          latitude: String?,
-                         longitude: String?,
-                         labels: String?
+                         longitude: String?
     ) {
 
         PLogMetaInfoProvider.elkStackSupported = true
@@ -181,7 +179,7 @@ object LogsHelper {
             PLogMQTTProvider.initMQTTClient(context,
                     writeLogsToLocalStorage = writeLogsToLocalStorage ?: true,
                     topic = topic ?: "",
-                    brokerUrl = brokerUrl ?: "",
+                    brokerUrl = brokerUrl,
                     certificateStream = certificateInputStream,
                     clientId = clientId ?: "",
                     port = port ?: "",
