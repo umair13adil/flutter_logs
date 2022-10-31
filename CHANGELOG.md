@@ -1,3 +1,6 @@
+## 2.1.8
+* Fixed build issues from [PR #47]
+
 ## 2.1.7
 * Added Support for Android Embedding v2
 * Updated dependencies
