@@ -2,14 +2,14 @@ group 'com.flutter.logs.plogs.flutter_logs'
 version '1.0-SNAPSHOT'
 
 buildscript {
-    ext.kotlin_version = '1.5.31'
+    ext.kotlin_version = '1.7.10'
     repositories {
         mavenCentral()
         google()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.1.1'
+        classpath 'com.android.tools.build:gradle:7.1.3'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
@@ -26,13 +26,13 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 33
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
     defaultConfig {
-        minSdkVersion 16
+        minSdkVersion 23
     }
     lintOptions {
         disable 'InvalidPackage'
@@ -47,12 +47,9 @@ dependencies {
     implementation  'io.reactivex.rxjava2:rxkotlin:2.2.0'
 
     //PLogs
-    implementation "com.github.umair13adil:RxLogs:1.0.16"
+    implementation "com.github.umair13adil:RxLogs:1.0.17"
 
-    implementation "androidx.core:core-ktx:1.6.0"
-
-    def work_version = "2.7.0"
-
+    implementation "androidx.core:core-ktx:1.9.0"
     // Kotlin + coroutines
-    implementation "androidx.work:work-runtime-ktx:$work_version"
+    implementation "androidx.work:work-runtime-ktx:2.7.1"
 }

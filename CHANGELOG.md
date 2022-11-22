@@ -1,3 +1,6 @@
+## 2.1.9
+* Added support for Android SDK 33
+
 ## 2.1.8
 * Fixed build issues from [PR #47]
 
