@@ -32,7 +32,7 @@ android {
         main.java.srcDirs += 'src/main/kotlin'
     }
     defaultConfig {
-        minSdkVersion 23
+        minSdkVersion 16
     }
     lintOptions {
         disable 'InvalidPackage'
@@ -47,7 +47,7 @@ dependencies {
     implementation  'io.reactivex.rxjava2:rxkotlin:2.2.0'
 
     //PLogs
-    implementation "com.github.umair13adil:RxLogs:1.0.17"
+    implementation "com.github.umair13adil:RxLogs:1.0.18"
 
     implementation "androidx.core:core-ktx:1.9.0"
     // Kotlin + coroutines

@@ -1,3 +1,6 @@
+## 2.1.10
+* Set min sdkVersion to 16
+
 ## 2.1.9
 * Added support for Android SDK 33
 
