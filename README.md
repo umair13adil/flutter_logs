@@ -414,4 +414,6 @@ Flutter Logs plugin is developed by Umair Adil. You can email me at <m.umair.adi
 
 # Support
 
-<script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="umairadil" data-color="#40DCA5" data-emoji=""  data-font="Cookie" data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#ffffff" data-coffee-color="#FFDD00" ></script>
+Buy a coffe to [Umair Adil](https://twitter.com/umair13adil), creator of this plugin.
+
+[![Buy me a coffee](https://www.buymeacoffee.com/assets/img/guidelines/download-assets-sm-1.svg)](https://www.buymeacoffee.com/umairadil)
