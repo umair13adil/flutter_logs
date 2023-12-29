@@ -27,6 +27,7 @@ apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion 33
+    namespace 'com.flutter.logs.plogs.flutter_logs'
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
