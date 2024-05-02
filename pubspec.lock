@@ -103,10 +103,6 @@ packages:
     dependency: transitive
     description:
       name: meta
-      sha256: d584fa6707a52763a52446f02cc621b077888fb63b93bbcb1143a7be5a0c0c04
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.11.0"
   path:
     dependency: transitive
     description:
@@ -187,11 +183,4 @@ packages:
   vm_service:
     dependency: transitive
     description:
-      name: vm_service
-      sha256: b3d56ff4341b8f182b96aceb2fa20e3dcb336b9f867bc0eafc0de10f1048e957
-      url: "https://pub.dev"
-    source: hosted
-    version: "13.0.0"
-sdks:
-  dart: ">=3.2.0-0 <4.0.0"
   flutter: ">=1.10.0"
