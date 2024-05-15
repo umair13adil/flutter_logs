@@ -86,7 +86,12 @@ In your main.dart file add like this:
      logsWriteDirectoryName: "MyLogs",
      logsExportDirectoryName: "MyLogs/Exported",
      debugFileOperations: true,
-     isDebuggable: true);
+     isDebuggable: true,
+     logsRetentionPeriodInDays = 14,
+     zipsRetentionPeriodInDays = 3,
+     autoDeleteZipOnExport = false,
+     autoClearLogs = true
+     );
 
      runApp(MyApp());
    }
