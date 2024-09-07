@@ -86,7 +86,8 @@ In your main.dart file add like this:
      logsWriteDirectoryName: "MyLogs",
      logsExportDirectoryName: "MyLogs/Exported",
      debugFileOperations: true,
-     isDebuggable: true);
+     isDebuggable: true, 
+             enabled: true);
 
      runApp(MyApp());
    }
@@ -244,6 +245,41 @@ To export custom file logs:
           //TODO Get results of logs print here
         }
       });
+```
+
+### Exports logs manually
+-------------------------------------------
+Include dependency:
+
+```yaml
+         flutter_archive: ^6.0.3
+```
+
+```dart
+
+       Directory? externalDirectory;
+      
+       if (Platform.isIOS) {
+           externalDirectory = await getApplicationDocumentsDirectory();
+       } else {
+           externalDirectory = await getExternalStorageDirectory();
+       }
+
+      File file = File("${externalDirectory!.path}/$_logsDirectory");
+      
+      final zipFile = File("${externalDirectory.path}/logs.zip");
+      try {
+           await ZipFile.createFromDirectory(
+           sourceDir: Directory(file.path),
+           zipFile: zipFile,
+           includeBaseDirectory: true);
+      } catch (e) {
+           print(e);
+      }
+
+      logInfo(_tag, "uploadFile", 'Storage:${file.path}, Zip: ${zipFile.path}');
+}
+
 ```
 
 Clear Logs

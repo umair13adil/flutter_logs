@@ -65,7 +65,7 @@ object LogsHelper {
                 zipFileName = zipFileName ?: "",
                 exportPath = File(context.getExternalFilesDir(null), savePath + File.separator + exportPath).path,
                 singleLogFileSize = singleLogFileSize ?: 1,
-                enableLogsWriteToFile = enabled ?: true
+                isEnabled = enabled ?: true
         )
 
         savePath?.let {

@@ -1,3 +1,8 @@
+## 2.2.0
+* Updated RxLogs version
+* Added support for 'isEnabled' flag to disable logs writing completely
+
+
 ## 2.1.10
 * Set min sdkVersion to 16
 

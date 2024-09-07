@@ -20,9 +20,12 @@ import io.reactivex.schedulers.Schedulers
 
 class FlutterLogsPlugin : FlutterPlugin, ActivityAware {
 
-    override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
+    private var applicationContext: Context? = null
+
+    override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
+        this.applicationContext = flutterPluginBinding.applicationContext
         binaryMessenger = flutterPluginBinding.binaryMessenger
-        setUpPluginMethods(flutterPluginBinding.applicationContext, flutterPluginBinding.binaryMessenger)
+        setUpPluginMethods(flutterPluginBinding.applicationContext, binaryMessenger!!)
     }
 
     companion object {

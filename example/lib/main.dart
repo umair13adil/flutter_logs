@@ -42,7 +42,8 @@ class _MyAppState extends State<MyApp> {
         logsWriteDirectoryName: "MyLogs",
         logsExportDirectoryName: "MyLogs/Exported",
         debugFileOperations: true,
-        isDebuggable: true);
+        isDebuggable: true,
+        enabled: true);
 
     // [IMPORTANT] The first log line must never be called before 'FlutterLogs.initLogs'
     FlutterLogs.logInfo(_tag, "setUpLogs", "setUpLogs: Setting up logs..");

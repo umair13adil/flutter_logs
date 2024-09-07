@@ -26,7 +26,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 33
+    compileSdkVersion 34
     namespace 'com.flutter.logs.plogs.flutter_logs'
 
     compileOptions {
@@ -61,7 +61,7 @@ dependencies {
     implementation  'io.reactivex.rxjava2:rxkotlin:2.2.0'
 
     //RxLogs
-    implementation "com.github.umair13adil:RxLogs:1.0.20"
+    implementation "com.github.umair13adil:RxLogs:v1.0.23"
 
     implementation "androidx.core:core-ktx:1.9.0"
     // Kotlin + coroutines
