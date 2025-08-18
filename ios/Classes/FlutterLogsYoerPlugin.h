@@ -1,4 +1,4 @@
 #import <Flutter/Flutter.h>
 
-@interface FlutterLogsPlugin : NSObject<FlutterPlugin>
+@interface FlutterLogsYoerPlugin : NSObject<FlutterPlugin>
 @end

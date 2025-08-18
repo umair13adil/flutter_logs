@@ -8,8 +8,8 @@
 #import "flutter_logs_yoer-Swift.h"
 #endif
 
-@implementation FlutterLogsPlugin
+@implementation FlutterLogsYoerPlugin
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
-  [SwiftFlutterLogsPlugin registerWithRegistrar:registrar];
+  [SwiftFlutterLogsYoerPlugin registerWithRegistrar:registrar];
 }
 @end
