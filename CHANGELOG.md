@@ -1,4 +1,5 @@
 ## 2.2.1
+* Add cache directory option on iOS, support log directory configuration as Cache
 * Updated sourceCompatibility & targetCompatibility to JavaVersion.VERSION_1_8
 
 ## 2.2.0
