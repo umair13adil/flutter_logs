@@ -1,8 +1,7 @@
-# flutter_logs
-#### A file based advanced logging framework for Flutter Apps (Android).
-##### iOS Support comming soon.
+# flutter_logs_yoer_example
+#### A file based advanced logging framework for Flutter Apps (Android & iOS) - Forked and improved from flutter_logs.
 
-[![pub package](https://img.shields.io/pub/v/flutter_logs)](https://pub.dev/packages/flutter_logs)
+[![pub package](https://img.shields.io/pub/v/flutter_logs_yoer)](https://pub.dev/packages/flutter_logs_yoer)
 
 Overview
 --------
@@ -54,7 +53,7 @@ Hourly logs are autumatically generated once this line is called:
 
 ```dart
 
-FlutterLogs.logThis(
+FlutterLogsYoer.logThis(
         tag: 'MyApp',
         subTag: 'logData',
         logMessage:
@@ -74,7 +73,7 @@ Define log file name in logs configuration:
 
 ```dart
     
-    await FlutterLogs.initLogs(
+    await FlutterLogsYoer.initLogs(
         logTypesEnabled: ["Locations","Jobs","API"]);
  ```
 
@@ -85,7 +84,7 @@ Log data to file. You can choose to either append to file or overwrite to comple
 
 ```dart
     
-    FlutterLogs.logToFile(
+    FlutterLogsYoer.logToFile(
         logFileName: "Locations",
         overwrite: false,
         logMessage:
@@ -99,7 +98,7 @@ You can export logs to output path sepcified in logs configuration:
 
 ```dart
     
-    await FlutterLogs.initLogs(
+    await FlutterLogsYoer.initLogs(
         logsExportDirectoryName: "MyLogs/Exported");
 ```
 
@@ -107,7 +106,7 @@ To export logs call this:
 
 ```dart
     
-    FlutterLogs.exportLogs(
+    FlutterLogsYoer.exportLogs(
         exportType: ExportType.ALL, decryptBeforeExporting: true);
 ```
 
@@ -115,7 +114,7 @@ To export custom file logs:
 
 ```dart
     
- FlutterLogs.exportFileLogForName(
+ FlutterLogsYoer.exportFileLogForName(
         logFileName: "Locations", decryptBeforeExporting: true);
 ```
 
@@ -124,7 +123,7 @@ Clear Logs
 
 ```dart
     
- FlutterLogs.clearLogs();
+ FlutterLogsYoer.clearLogs();
 ```
 
 ## Setting Up
@@ -134,7 +133,7 @@ _______________________________________________
 
 ```dart
     
-    await FlutterLogs.initLogs(
+    await FlutterLogsYoer.initLogs(
         logLevelsEnabled: [
           LogLevel.INFO,
           LogLevel.WARNING,
@@ -158,7 +157,7 @@ Send additional Meta info for better filtering at LogStash dashboard. With this 
 
 ```dart
 
-    await FlutterLogs.setMetaInfo(
+    await FlutterLogsYoer.setMetaInfo(
       appId: "flutter_logs_example",
       appName: "Flutter Logs Demo",
       appVersion: "1.0",
@@ -253,7 +252,7 @@ Add following block for initializing MQTT logging.
 
 ```dart
         
-    await FlutterLogs.initMQTT(
+    await FlutterLogsYoer.initMQTT(
         topic: "YOUR_TOPIC",
         brokerUrl: "", //Add URL without schema
         certificate: "m2mqtt_ca.crt",
@@ -264,7 +263,7 @@ That's it, MQTT setup is done. If only MQTT feature is required then set this fl
 
 ```dart
         
-    await FlutterLogs.initMQTT(
+    await FlutterLogsYoer.initMQTT(
         writeLogsToLocalStorage: false);
 ```
 

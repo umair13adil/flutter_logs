@@ -2,7 +2,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  const MethodChannel channel = MethodChannel('flutter_logs');
+  const MethodChannel channel = MethodChannel('flutter_logs_yoer');
 
   TestWidgetsFlutterBinding.ensureInitialized();
 

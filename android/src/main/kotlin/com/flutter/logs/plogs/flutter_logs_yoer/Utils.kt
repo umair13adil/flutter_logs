@@ -1,4 +1,4 @@
-package com.flutter.logs.plogs.flutter_logs
+package com.flutter.logs.plogs.flutter_logs_yoer
 
 import com.blackbox.plog.pLogs.exporter.ExportType
 import com.blackbox.plog.pLogs.formatter.TimeStampFormat

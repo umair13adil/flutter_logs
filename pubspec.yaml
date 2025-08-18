@@ -1,8 +1,8 @@
-name: flutter_logs
-description: An extensive filebased logging framework for flutter apps. (ELK Stack Supported)
+name: flutter_logs_yoer
+description: An extensive filebased logging framework for flutter apps. (ELK Stack Supported) - Forked and improved from flutter_logs
 version: 2.2.1
-homepage: https://github.com/umair13adil/flutter_logs
-repository: https://github.com/umair13adil/flutter_logs
+homepage: https://github.com/yoer/flutter_logs
+repository: https://github.com/yoer/flutter_logs
 
 environment:
   sdk: ">=3.3.0 <4.0.0"
@@ -22,7 +22,7 @@ flutter:
   plugin:
     platforms:
       android:
-        package: com.flutter.logs.plogs.flutter_logs
-        pluginClass: FlutterLogsPlugin
+        package: com.flutter.logs.plogs.flutter_logs_yoer
+        pluginClass: FlutterLogsYoerPlugin
       ios:
-        pluginClass: FlutterLogsPlugin
+        pluginClass: FlutterLogsYoerPlugin

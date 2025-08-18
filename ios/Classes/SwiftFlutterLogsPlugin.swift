@@ -1,7 +1,7 @@
 import Flutter
 import UIKit
 
-public class SwiftFlutterLogsPlugin: NSObject, FlutterPlugin {
+public class SwiftFlutterLogsYoerPlugin: NSObject, FlutterPlugin {
     
     var eventSink: FlutterEventSink?
     static var channel : FlutterMethodChannel?
@@ -15,14 +15,14 @@ public class SwiftFlutterLogsPlugin: NSObject, FlutterPlugin {
     }
     
     public static func register(with registrar: FlutterPluginRegistrar) {
-        let channel = FlutterMethodChannel(name: "flutter_logs", binaryMessenger: registrar.messenger())
+        let channel = FlutterMethodChannel(name: "flutter_logs_yoer", binaryMessenger: registrar.messenger())
         
         setChannel(mChannel:channel)
         
-        let instance = SwiftFlutterLogsPlugin()
+        let instance = SwiftFlutterLogsYoerPlugin()
         registrar.addMethodCallDelegate(instance, channel: channel)
         
-        let eventChannel = FlutterEventChannel(name: "flutter_logs_plugin_stream", binaryMessenger: registrar.messenger())
+        let eventChannel = FlutterEventChannel(name: "flutter_logs_yoer_plugin_stream", binaryMessenger: registrar.messenger())
         
         let eventHandler = EventsStreamHandler(instance:instance, channel: channel, registrar: registrar)
         eventChannel.setStreamHandler(eventHandler)
@@ -83,14 +83,14 @@ public class SwiftFlutterLogsPlugin: NSObject, FlutterPlugin {
                 result("iOS could not extract flutter arguments in method: (logToFile)")
             }
         }else if call.method == "exportLogs" {
-            LogHelper.getFiles(result:result,eventSink:eventSink, channel:SwiftFlutterLogsPlugin.channel)
+            LogHelper.getFiles(result:result,eventSink:eventSink, channel:SwiftFlutterLogsYoerPlugin.channel)
         }else if call.method == "exportFileLogForName" {
             
         }else if call.method == "clearLogs" {
             LogHelper.clearLogs(result:result)
             result("Logs are cleared.")
         }else if call.method == "printLogs" {
-            LogHelper.printLogs(result:result,eventSink:eventSink, channel:SwiftFlutterLogsPlugin.channel)
+            LogHelper.printLogs(result:result,eventSink:eventSink, channel:SwiftFlutterLogsYoerPlugin.channel)
         }
     }
 }
@@ -101,9 +101,9 @@ class EventsStreamHandler: NSObject, FlutterStreamHandler {
     
     private var fChannel:FlutterMethodChannel
     private var fRegistrar: FlutterPluginRegistrar?
-    var instance: SwiftFlutterLogsPlugin?
+    var instance: SwiftFlutterLogsYoerPlugin?
     
-    init(instance: SwiftFlutterLogsPlugin?, channel:FlutterMethodChannel,registrar: FlutterPluginRegistrar) {
+    init(instance: SwiftFlutterLogsYoerPlugin?, channel:FlutterMethodChannel,registrar: FlutterPluginRegistrar) {
         self.instance = instance
         self.fChannel = channel
         self.fRegistrar = registrar

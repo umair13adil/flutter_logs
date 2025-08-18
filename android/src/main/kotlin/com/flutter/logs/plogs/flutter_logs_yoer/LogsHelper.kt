@@ -1,4 +1,4 @@
-package com.flutter.logs.plogs.flutter_logs
+package com.flutter.logs.plogs.flutter_logs_yoer
 
 import android.content.Context
 import com.blackbox.plog.elk.PLogMetaInfoProvider

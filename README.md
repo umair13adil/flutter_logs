@@ -1,7 +1,7 @@
-# flutter_logs
+# flutter_logs_yoer
 #### A file based advanced logging framework for Flutter Apps (Android & iOS).
 
-[![pub package](https://img.shields.io/pub/v/flutter_logs)](https://pub.dev/packages/flutter_logs)
+[![pub package](https://img.shields.io/pub/v/flutter_logs_yoer)](https://pub.dev/packages/flutter_logs_yoer)
 
 Overview
 --------
@@ -12,7 +12,7 @@ Flutter logs can work with Logstash by writing JSON delimited logs to log files.
 
 ![Image1](pictures/picture1.png)
 
-##### Read more about flutter_logs usage on this Medium article: 
+##### Read more about flutter_logs_yoer usage on this Medium article: 
 
 [Sending logs from Flutter apps in real-time using ELK stack & MQTT](https://itnext.io/sending-logs-from-flutter-apps-in-real-time-using-elk-stack-mqtt-c24fa0cb9802)
 
@@ -50,11 +50,11 @@ In your pubspec.yaml
 
 ```yaml
 dependencies:
-    flutter_logs: [Latest_Version]
+    flutter_logs_yoer: [Latest_Version]
 ```
 
 ```dart
-import 'package:flutter_logs/flutter_logs.dart';
+import 'package:flutter_logs_yoer/flutter_logs_yoer.dart';
 ```
 
 ## Setting Up
@@ -66,13 +66,13 @@ In your main.dart file add like this:
 
 ```dart
    
-   import 'package:flutter_logs/flutter_logs.dart';
+   import 'package:flutter_logs_yoer/flutter_logs_yoer.dart';
 
    Future<void> main() async {
      WidgetsFlutterBinding.ensureInitialized();
 
      //Initialize Logging
-     await FlutterLogs.initLogs(
+     await FlutterLogsYoer.initLogs(
      logLevelsEnabled: [
        LogLevel.INFO,
        LogLevel.WARNING,
@@ -107,7 +107,7 @@ Hourly Logs
 Hourly logs are automatically generated once this line is called. These logs are sorted and named according to current time (24h format) on device e.g. 0110202013.log 
 
 ```dart
-FlutterLogs.logThis(
+FlutterLogsYoer.logThis(
         tag: 'MyApp',
         subTag: 'logData',
         logMessage:
@@ -118,13 +118,13 @@ FlutterLogs.logThis(
 Or simply call this:
 
 ```dart
-    FlutterLogs.logInfo("TAG", "subTag", "My Log Message");
+    FlutterLogsYoer.logInfo("TAG", "subTag", "My Log Message");
     
-    FlutterLogs.logWarn("TAG", "subTag", "My Log Message");
+    FlutterLogsYoer.logWarn("TAG", "subTag", "My Log Message");
     
-    FlutterLogs.logError("TAG", "subTag", "My Log Message");
+    FlutterLogsYoer.logError("TAG", "subTag", "My Log Message");
     
-    FlutterLogs.logErrorTrace("TAG", "subTag", "My Log Message", Error());
+    FlutterLogsYoer.logErrorTrace("TAG", "subTag", "My Log Message", Error());
 ```
 
 This will create a new file in storage directory according to time on device. For a single date, all logs will be present in a single directory.
@@ -142,7 +142,7 @@ These logs will be kept in a seperate file.
  Here 3 files of logs are defined, logger will use these file name as keys to write data in them.      
  
 ```dart
-    await FlutterLogs.initLogs(
+    await FlutterLogsYoer.initLogs(
         logTypesEnabled: ["Locations","Jobs","API"]);
  ```
 
@@ -150,7 +150,7 @@ These logs will be kept in a seperate file.
 Log data to file. You can choose to either append to file or overwrite to complete file.
 
 ```dart
-    FlutterLogs.logToFile(
+    FlutterLogsYoer.logToFile(
         logFileName: "Locations",
         overwrite: false,
         logMessage:
@@ -181,31 +181,31 @@ Export/Print Logs
 You can export logs to output path sepcified in logs configuration:
 
 ```dart
-    await FlutterLogs.initLogs(
+    await FlutterLogsYoer.initLogs(
         logsExportDirectoryName: "MyLogs/Exported");
 ```
 
 To export logs call this:
 
 ```dart
-    FlutterLogs.exportLogs(
+    FlutterLogsYoer.exportLogs(
         exportType: ExportType.ALL);
 ```
 
 ```dart
-    FlutterLogs.printLogs(
+    FlutterLogsYoer.printLogs(
         exportType: ExportType.ALL);
 ```
 
 To export custom file logs:
 
 ```dart
- FlutterLogs.exportFileLogForName(
+ FlutterLogsYoer.exportFileLogForName(
         logFileName: "Locations");
 ```
 
 ```dart
- FlutterLogs.printFileLogForName(
+ FlutterLogsYoer.printFileLogForName(
         logFileName: "Locations");
 ```
 
@@ -215,10 +215,10 @@ To export custom file logs:
 ```dart
     import 'dart:async';
     import 'dart:io';
-    import 'package:flutter_logs/flutter_logs.dart';
+    import 'package:flutter_logs_yoer/flutter_logs_yoer.dart';
     import 'package:path_provider/path_provider.dart';
 
-    FlutterLogs.channel.setMethodCallHandler((call) async {
+    FlutterLogsYoer.channel.setMethodCallHandler((call) async {
         if (call.method == 'logsExported') {
           var zipName = "${call.arguments.toString()}";
 
@@ -230,18 +230,18 @@ To export custom file logs:
               externalDirectory = await getExternalStorageDirectory();
             }
 
-            FlutterLogs.logInfo(TAG, "found", 'External Storage:$externalDirectory');
+            FlutterLogsYoer.logInfo(TAG, "found", 'External Storage:$externalDirectory');
 
           File file = File("${externalDirectory.path}/$zipName");
 
-          FlutterLogs.logInfo(
+          FlutterLogsYoer.logInfo(
               TAG, "path", 'Path: \n${file.path.toString()}');
 
           if (file.existsSync()) {
-            FlutterLogs.logInfo(
+            FlutterLogsYoer.logInfo(
                 TAG, "existsSync", 'Logs found and ready to export!');
           } else {
-            FlutterLogs.logError(
+            FlutterLogsYoer.logError(
                 TAG, "existsSync", "File not found in storage.");
           }
           
@@ -290,7 +290,7 @@ Clear Logs
 -----------
 
 ```dart
- FlutterLogs.clearLogs();
+ FlutterLogsYoer.clearLogs();
 ```
 
 Errors/Exception Logs
@@ -303,7 +303,7 @@ Printing exception logs:
           var i = 100 ~/ 0;
           print("$i");
       } catch (e) {
-          FlutterLogs.logThis(
+          FlutterLogsYoer.logThis(
               tag: 'MyApp',
               subTag: 'Caught an exception.',
               logMessage: 'Caught an exception!',
@@ -319,7 +319,7 @@ Printing error logs:
           var i = null;
           print(i * 10);
       } catch (e) {
-          FlutterLogs.logThis(
+          FlutterLogsYoer.logThis(
               tag: 'MyApp',
               subTag: 'Caught an error.',
               logMessage: 'Caught an exception!',
@@ -334,7 +334,7 @@ _______________________________________________
 Send additional Meta info for better filtering at LogStash dashboard. With this setting, logs will be logged as JSON-delemited.
 
 ```dart
-    await FlutterLogs.setMetaInfo(
+    await FlutterLogsYoer.setMetaInfo(
       appId: "flutter_logs_example",
       appName: "Flutter Logs Demo",
       appVersion: "1.0",
@@ -425,7 +425,7 @@ flutter:
 Add following block for initializing MQTT logging.
 
 ```dart 
-    await FlutterLogs.initMQTT(
+    await FlutterLogsYoer.initMQTT(
         topic: "YOUR_TOPIC",
         brokerUrl: "", //Add URL without schema
         certificate: "m2mqtt_ca.crt",
@@ -435,7 +435,7 @@ Add following block for initializing MQTT logging.
 That's it, MQTT setup is done. If only MQTT feature is required then set this flag to false to stop writing logs to storage directory:
 
 ```dart
-    await FlutterLogs.initMQTT(
+    await FlutterLogsYoer.initMQTT(
         writeLogsToLocalStorage: false);
 ```
 

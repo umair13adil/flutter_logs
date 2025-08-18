@@ -29,7 +29,7 @@ class LogHelper: NSObject {
         }
 
         // Store the directory preference for use in defaultLogsDirectoryURL
-        UserDefaults.standard.set(useCachesDirectory, forKey: "FlutterLogs_UseCachesDirectory")
+        UserDefaults.standard.set(useCachesDirectory, forKey: "FlutterLogsYoer_UseCachesDirectory")
     }
     
     static func logToFile(result: @escaping FlutterResult, logFileName:String, message:String,

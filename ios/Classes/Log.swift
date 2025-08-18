@@ -35,26 +35,21 @@ public struct Logging {
     
     public static func defaultLogsDirectoryURL() -> URL? {
         // Check user preference for directory type
-        let useCachesDirectory = UserDefaults.standard.bool(forKey: "FlutterLogs_UseCachesDirectory")
+        let useCachesDirectory = UserDefaults.standard.bool(forKey: "FlutterLogsYoer_UseCachesDirectory")
         let searchPathDirectory: FileManager.SearchPathDirectory = useCachesDirectory ? .cachesDirectory : .applicationSupportDirectory
 
         do {
             let dir = try _fileManager.url(for: searchPathDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
             var dirURL = dir.appendingPathComponent(LogDirectoryName)
 
-            Swift.print("FlutterLogs: Final log directory path: \(dirURL.path)")
-
             // Create directory if needed
             if !_fileManager.fileExists(atPath: dirURL.path) {
                 try _fileManager.createDirectory(at: dirURL, withIntermediateDirectories: true, attributes: nil)
-                Swift.print("FlutterLogs: Created directory: \(dirURL.path)")
 
                 // Exclude Logs directory from backups
                 var values = URLResourceValues()
                 values.isExcludedFromBackup = true
                 try dirURL.setResourceValues(values)
-            } else {
-                Swift.print("FlutterLogs: Directory already exists: \(dirURL.path)")
             }
             return dirURL
         } catch let error as NSError {

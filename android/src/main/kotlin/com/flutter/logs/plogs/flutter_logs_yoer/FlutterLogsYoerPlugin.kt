@@ -1,4 +1,4 @@
-package com.flutter.logs.plogs.flutter_logs
+package com.flutter.logs.plogs.flutter_logs_yoer
 
 import android.app.Activity
 import android.content.Context
@@ -18,7 +18,7 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 
 
-class FlutterLogsPlugin : FlutterPlugin, ActivityAware {
+class FlutterLogsYoerPlugin : FlutterPlugin, ActivityAware {
 
     private var applicationContext: Context? = null
 
@@ -29,7 +29,7 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware {
     }
 
     companion object {
-        private val TAG = "FlutterLogsPlugin"
+        private val TAG = "FlutterLogsYoerPlugin"
         private var channel: MethodChannel? = null
         private var event_channel: EventChannel? = null
 
@@ -42,7 +42,7 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware {
         @JvmStatic
         private fun setUpPluginMethods(context: Context, messenger: BinaryMessenger) {
           
-            channel = MethodChannel(messenger, "flutter_logs")
+            channel = MethodChannel(messenger, "flutter_logs_yoer")
 
             channel?.setMethodCallHandler { call, result ->
                 when (call.method) {

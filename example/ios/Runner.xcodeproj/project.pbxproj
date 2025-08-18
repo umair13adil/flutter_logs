@@ -374,7 +374,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Flutter",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.flutter.logs.plogs.flutterlogs.flutterLogsExample;
+				PRODUCT_BUNDLE_IDENTIFIER = com.flutter.logs.plogs.FlutterLogsYoer.flutterLogsExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -518,7 +518,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Flutter",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.flutter.logs.plogs.flutterlogs.flutterLogsExample;
+				PRODUCT_BUNDLE_IDENTIFIER = com.flutter.logs.plogs.FlutterLogsYoer.flutterLogsExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -555,7 +555,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Flutter",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.flutter.logs.plogs.flutterlogs.flutterLogsExample;
+				PRODUCT_BUNDLE_IDENTIFIER = com.flutter.logs.plogs.FlutterLogsYoer.flutterLogsExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;

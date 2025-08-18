@@ -34,7 +34,7 @@ enum TimeStampFormat {
 
 enum ExportType { TODAY, LAST_HOUR, WEEKS, LAST_24_HOURS, ALL }
 
-class FlutterLogs {
+class FlutterLogsYoer {
   // 0 = no messages, 1 = only errors, 2 = all
   static int _debugLevel = 2;
 
@@ -46,11 +46,11 @@ class FlutterLogs {
   // Send the message [msg] with the [msgDebugLevel] value. 1 = error, 2 = info
   static void printDebugMessage(String msg, int msgDebugLevel) {
     if (_debugLevel >= msgDebugLevel) {
-      print('flutter_logs: $msg');
+      print('flutter_logs_yoer: $msg');
     }
   }
 
-  static const MethodChannel channel = const MethodChannel('flutter_logs');
+  static const MethodChannel channel = const MethodChannel('flutter_logs_yoer');
 
   static Future<String> initLogs(
       {List<LogLevel>? logLevelsEnabled,
