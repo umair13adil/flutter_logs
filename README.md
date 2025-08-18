@@ -1,5 +1,5 @@
 # flutter_logs_yoer
-#### A file based advanced logging framework for Flutter Apps (Android & iOS).
+#### A file based advanced logging framework for Flutter Apps (Android & iOS). - Forked and improved from flutter_logs.
 
 [![pub package](https://img.shields.io/pub/v/flutter_logs_yoer)](https://pub.dev/packages/flutter_logs_yoer)
 

@@ -1,4 +1,4 @@
-#import "FlutterLogsPlugin.h"
+#import "FlutterLogsYoerPlugin.h"
 #if __has_include(<flutter_logs_yoer/flutter_logs_yoer-Swift.h>)
 #import <flutter_logs_yoer/flutter_logs_yoer-Swift.h>
 #else
