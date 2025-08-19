@@ -37,7 +37,7 @@ In your pubspec.yaml
 
 ```yaml
 dependencies:
-  flutter_logs: [LATEST_VERSION]
+  flutter_logs_yoer: [LATEST_VERSION]
 ```
 
 ```dart
