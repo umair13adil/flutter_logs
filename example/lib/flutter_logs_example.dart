@@ -22,7 +22,7 @@ class _MyAppState extends State<MyApp> {
   static Completer _completer = new Completer<String>();
 
   final TextEditingController _keywordsController = TextEditingController();
-  FilterType _filterType = FilterType.OR;
+  //FilterType _filterType = FilterType.OR;
 
   // Feature toggle states
   bool _backpressureEnabled = false;
@@ -104,17 +104,18 @@ class _MyAppState extends State<MyApp> {
         isDebuggable: true,
         enabled: true,
         // Backpressure Configuration
-        backpressureConfig: BackpressureConfig(
-          queueCapacity: 500, // Max logs in queue before dropping
-          warnQueueCapacity: 400, // Warn when queue reaches this size
-          perLevelQuotas: {
-            LogLevel.INFO: 100, // Max 100 INFO logs per window
-            LogLevel.WARNING: 50, // Max 50 WARNING logs per window
-            LogLevel.ERROR: 200, // Max 200 ERROR logs per window (prioritize errors)
-            LogLevel.SEVERE: 200, // Max 200 SEVERE logs per window
-          },
-          quotaWindowMillis: 60000, // 1 minute window for quotas
-        ));
+        // backpressureConfig: BackpressureConfig(
+        //   queueCapacity: 500, // Max logs in queue before dropping
+        //   warnQueueCapacity: 400, // Warn when queue reaches this size
+        //   perLevelQuotas: {
+        //     LogLevel.INFO: 100, // Max 100 INFO logs per window
+        //     LogLevel.WARNING: 50, // Max 50 WARNING logs per window
+        //     LogLevel.ERROR: 200, // Max 200 ERROR logs per window (prioritize errors)
+        //     LogLevel.SEVERE: 200, // Max 200 SEVERE logs per window
+        //   },
+        //   quotaWindowMillis: 60000, // 1 minute window for quotas
+        // )
+    );
 
     setState(() => _backpressureEnabled = true);
     FlutterLogs.logInfo(_tag, "setUpLogsWithBackpressure",
@@ -145,45 +146,46 @@ class _MyAppState extends State<MyApp> {
         isDebuggable: true,
         enabled: true,
         // Redaction Configuration for sensitive data masking
-        redactionConfig: RedactionConfig(
-          // Enable built-in patterns for common sensitive data
-          enableBuiltInPatterns: {
-            BuiltInPattern.EMAIL, // Masks email addresses
-            BuiltInPattern.PHONE_NUMBER, // Masks phone numbers
-            BuiltInPattern.CREDIT_CARD, // Masks credit card numbers
-            BuiltInPattern.JWT_TOKEN, // Masks JWT tokens
-            BuiltInPattern.IP_ADDRESS, // Masks IP addresses
-          },
-          // Custom redaction rules for app-specific sensitive data
-          customRules: [
-            // Mask SSN patterns (XXX-XX-XXXX)
-            RedactionRule(
-              name: 'SSN',
-              patternString: r'\b\d{3}-\d{2}-\d{4}\b',
-              maskType: MaskType.FULL_MASK,
-            ),
-            // Partially mask API keys (show first 4 chars)
-            RedactionRule(
-              name: 'API_KEY',
-              patternString: r'api_key[=:]\s*([A-Za-z0-9]{20,})',
-              maskType: MaskType.PARTIAL,
-            ),
-            // Hash user IDs for tracking without exposing actual IDs
-            RedactionRule(
-              name: 'USER_ID',
-              patternString: r'user_id[=:]\s*(\d+)',
-              maskType: MaskType.HASH,
-            ),
-            // Custom replacement for passwords
-            RedactionRule(
-              name: 'PASSWORD',
-              patternString: r'password[=:]\s*\S+',
-              maskType: MaskType.FULL_MASK,
-              replacement: 'password=[REDACTED]',
-            ),
-          ],
-          defaultMaskType: MaskType.FULL_MASK,
-        ));
+        // redactionConfig: RedactionConfig(
+        //   // Enable built-in patterns for common sensitive data
+        //   enableBuiltInPatterns: {
+        //     BuiltInPattern.EMAIL, // Masks email addresses
+        //     BuiltInPattern.PHONE_NUMBER, // Masks phone numbers
+        //     BuiltInPattern.CREDIT_CARD, // Masks credit card numbers
+        //     BuiltInPattern.JWT_TOKEN, // Masks JWT tokens
+        //     BuiltInPattern.IP_ADDRESS, // Masks IP addresses
+        //   },
+        //   // Custom redaction rules for app-specific sensitive data
+        //   customRules: [
+        //     // Mask SSN patterns (XXX-XX-XXXX)
+        //     RedactionRule(
+        //       name: 'SSN',
+        //       patternString: r'\b\d{3}-\d{2}-\d{4}\b',
+        //       maskType: MaskType.FULL_MASK,
+        //     ),
+        //     // Partially mask API keys (show first 4 chars)
+        //     RedactionRule(
+        //       name: 'API_KEY',
+        //       patternString: r'api_key[=:]\s*([A-Za-z0-9]{20,})',
+        //       maskType: MaskType.PARTIAL,
+        //     ),
+        //     // Hash user IDs for tracking without exposing actual IDs
+        //     RedactionRule(
+        //       name: 'USER_ID',
+        //       patternString: r'user_id[=:]\s*(\d+)',
+        //       maskType: MaskType.HASH,
+        //     ),
+        //     // Custom replacement for passwords
+        //     RedactionRule(
+        //       name: 'PASSWORD',
+        //       patternString: r'password[=:]\s*\S+',
+        //       maskType: MaskType.FULL_MASK,
+        //       replacement: 'password=[REDACTED]',
+        //     ),
+        //   ],
+        //   defaultMaskType: MaskType.FULL_MASK,
+    //    )
+    );
 
     setState(() => _redactionEnabled = true);
     FlutterLogs.logInfo(
@@ -212,33 +214,34 @@ class _MyAppState extends State<MyApp> {
         isDebuggable: true,
         enabled: true,
         // Backpressure Configuration
-        backpressureConfig: BackpressureConfig(
-          queueCapacity: 500,
-          warnQueueCapacity: 400,
-          perLevelQuotas: {
-            LogLevel.INFO: 100,
-            LogLevel.WARNING: 50,
-            LogLevel.ERROR: 200,
-            LogLevel.SEVERE: 200,
-          },
-          quotaWindowMillis: 60000,
-        ),
-        // Redaction Configuration
-        redactionConfig: RedactionConfig(
-          enableBuiltInPatterns: {
-            BuiltInPattern.EMAIL,
-            BuiltInPattern.PHONE_NUMBER,
-            BuiltInPattern.CREDIT_CARD,
-          },
-          customRules: [
-            RedactionRule(
-              name: 'SSN',
-              patternString: r'\b\d{3}-\d{2}-\d{4}\b',
-              maskType: MaskType.FULL_MASK,
-            ),
-          ],
-          defaultMaskType: MaskType.FULL_MASK,
-        ));
+        // backpressureConfig: BackpressureConfig(
+        //   queueCapacity: 500,
+        //   warnQueueCapacity: 400,
+        //   perLevelQuotas: {
+        //     LogLevel.INFO: 100,
+        //     LogLevel.WARNING: 50,
+        //     LogLevel.ERROR: 200,
+        //     LogLevel.SEVERE: 200,
+        //   },
+        //   quotaWindowMillis: 60000,
+        // ),
+        // // Redaction Configuration
+        // redactionConfig: RedactionConfig(
+        //   enableBuiltInPatterns: {
+        //     BuiltInPattern.EMAIL,
+        //     BuiltInPattern.PHONE_NUMBER,
+        //     BuiltInPattern.CREDIT_CARD,
+        //   },
+        //   customRules: [
+        //     RedactionRule(
+        //       name: 'SSN',
+        //       patternString: r'\b\d{3}-\d{2}-\d{4}\b',
+        //       maskType: MaskType.FULL_MASK,
+        //     ),
+        //   ],
+        //   defaultMaskType: MaskType.FULL_MASK,
+    //    )
+    );
 
     setState(() {
       _backpressureEnabled = true;
@@ -475,19 +478,19 @@ class _MyAppState extends State<MyApp> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text('Match: ', style: TextStyle(fontSize: 15)),
-                    ChoiceChip(
-                      label: Text('ANY (OR)'),
-                      selected: _filterType == FilterType.OR,
-                      onSelected: (_) =>
-                          setState(() => _filterType = FilterType.OR),
-                    ),
-                    SizedBox(width: 8),
-                    ChoiceChip(
-                      label: Text('ALL (AND)'),
-                      selected: _filterType == FilterType.AND,
-                      onSelected: (_) =>
-                          setState(() => _filterType = FilterType.AND),
-                    ),
+                    // ChoiceChip(
+                    //   label: Text('ANY (OR)'),
+                    //   selected: _filterType == FilterType.OR,
+                    //   onSelected: (_) =>
+                    //       setState(() => _filterType = FilterType.OR),
+                    // ),
+                    // SizedBox(width: 8),
+                    // ChoiceChip(
+                    //   label: Text('ALL (AND)'),
+                    //   selected: _filterType == FilterType.AND,
+                    //   onSelected: (_) =>
+                    //       setState(() => _filterType = FilterType.AND),
+                    // ),
                   ],
                 ),
                 SizedBox(height: 4),
@@ -598,7 +601,7 @@ class _MyAppState extends State<MyApp> {
       deviceBatteryPercent: "27",
       latitude: "55.0",
       longitude: "-76.0",
-      labels: {"env": "dev", "team": "mobile"},
+     // labels: {"env": "dev", "team": "mobile"},
     );
   }
 
@@ -705,15 +708,15 @@ class _MyAppState extends State<MyApp> {
       setLogsStatus(status: "Enter at least one keyword to search.");
       return;
     }
-    FlutterLogs.exportFilteredLogs(
-      keywords: keywords,
-      filterType: _filterType,
-      exportType: ExportType.ALL,
-      ignoreCase: true,
-    );
-    setLogsStatus(
-        status:
-            "Searching & exporting logs for: ${keywords.join(', ')} [${_filterType.name}]");
+    // FlutterLogs.exportFilteredLogs(
+    //   keywords: keywords,
+    //   filterType: _filterType,
+    //   exportType: ExportType.ALL,
+    //   ignoreCase: true,
+    // );
+    // setLogsStatus(
+    //     status:
+    //         "Searching & exporting logs for: ${keywords.join(', ')} [${_filterType.name}]");
   }
 
   void searchAndPrintLogs() {
@@ -722,15 +725,15 @@ class _MyAppState extends State<MyApp> {
       setLogsStatus(status: "Enter at least one keyword to search.");
       return;
     }
-    FlutterLogs.printFilteredLogs(
-      keywords: keywords,
-      filterType: _filterType,
-      exportType: ExportType.ALL,
-      ignoreCase: true,
-    );
-    setLogsStatus(
-        status:
-            "Searching & printing logs for: ${keywords.join(', ')} [${_filterType.name}]");
+    // FlutterLogs.printFilteredLogs(
+    //   keywords: keywords,
+    //   filterType: _filterType,
+    //   exportType: ExportType.ALL,
+    //   ignoreCase: true,
+    // );
+    // setLogsStatus(
+    //     status:
+    //         "Searching & printing logs for: ${keywords.join(', ')} [${_filterType.name}]");
   }
 
   void setLogsStatus({String status = '', bool append = false}) {
