@@ -33,6 +33,9 @@ Features (Android)
 - Export all or single types of logs
 - ELK Stack Supported See more about it [here](https://www.elastic.co/what-is/elk-stack).
 - MQTT Support (SSL)
+- **Backpressure support** for high-volume logging scenarios
+- **Redaction & Masking** for sensitive data (PII protection)
+- **Search & Filter** logs by keywords
 
 Features (iOS)
 ------------------
@@ -50,7 +53,7 @@ In your pubspec.yaml
 
 ```yaml
 dependencies:
-    flutter_logs: [Latest_Version]
+    flutter_logs: ^2.2.2
 ```
 
 ```dart
@@ -327,6 +330,134 @@ Printing error logs:
               level: LogLevel.ERROR);
       }
 ```
+
+Backpressure Support
+---------------------
+
+Backpressure helps manage high-volume logging scenarios by limiting queue size and setting quotas per log level to prevent memory issues and ensure critical logs are prioritized.
+
+```dart
+    await FlutterLogs.initLogs(
+        // ... other configurations ...
+        backpressureConfig: BackpressureConfig(
+          queueCapacity: 500,        // Max logs in queue before dropping
+          warnQueueCapacity: 400,    // Warn when queue reaches this size
+          perLevelQuotas: {
+            LogLevel.INFO: 100,      // Max 100 INFO logs per window
+            LogLevel.WARNING: 50,    // Max 50 WARNING logs per window
+            LogLevel.ERROR: 200,     // Prioritize error logs
+            LogLevel.SEVERE: 200,    // Prioritize severe logs
+          },
+          quotaWindowMillis: 60000,  // 1 minute window for quotas
+        ),
+    );
+```
+
+Redaction & Masking (PII Protection)
+---------------------
+
+Automatically mask sensitive data like emails, phone numbers, credit cards, and custom patterns in your logs for privacy and security compliance.
+
+#### Built-in Patterns
+
+```dart
+    await FlutterLogs.initLogs(
+        // ... other configurations ...
+        redactionConfig: RedactionConfig(
+          enableBuiltInPatterns: {
+            BuiltInPattern.EMAIL,        // Masks email addresses
+            BuiltInPattern.PHONE_NUMBER, // Masks phone numbers
+            BuiltInPattern.CREDIT_CARD,  // Masks credit card numbers
+            BuiltInPattern.JWT_TOKEN,    // Masks JWT tokens
+            BuiltInPattern.IP_ADDRESS,   // Masks IP addresses
+          },
+          defaultMaskType: MaskType.FULL_MASK,
+        ),
+    );
+```
+
+#### Custom Redaction Rules
+
+You can define custom rules with regex patterns:
+
+```dart
+    await FlutterLogs.initLogs(
+        // ... other configurations ...
+        redactionConfig: RedactionConfig(
+          enableBuiltInPatterns: {BuiltInPattern.EMAIL},
+          customRules: [
+            // Mask SSN patterns (XXX-XX-XXXX)
+            RedactionRule(
+              name: 'SSN',
+              patternString: r'\b\d{3}-\d{2}-\d{4}\b',
+              maskType: MaskType.FULL_MASK,
+            ),
+            // Partially mask API keys (show first 4 chars)
+            RedactionRule(
+              name: 'API_KEY',
+              patternString: r'api_key[=:]\s*([A-Za-z0-9]{20,})',
+              maskType: MaskType.PARTIAL,
+            ),
+            // Hash user IDs for tracking without exposing actual IDs
+            RedactionRule(
+              name: 'USER_ID',
+              patternString: r'user_id[=:]\s*(\d+)',
+              maskType: MaskType.HASH,
+            ),
+            // Custom replacement text
+            RedactionRule(
+              name: 'PASSWORD',
+              patternString: r'password[=:]\s*\S+',
+              maskType: MaskType.FULL_MASK,
+              replacement: 'password=[REDACTED]',
+            ),
+          ],
+          defaultMaskType: MaskType.FULL_MASK,
+        ),
+    );
+```
+
+#### Mask Types
+
+| MaskType | Description | Example |
+|----------|-------------|---------|
+| `FULL_MASK` | Completely masks the value | `john@email.com` → `[REDACTED]` |
+| `PARTIAL` | Shows partial value | `sk_live_abc123xyz` → `sk_l****` |
+| `HASH` | Replaces with hash | `user_id=12345` → `user_id=[HASH:a1b2c3]` |
+
+Search & Filter Logs
+---------------------
+
+Search through all log files for specific keywords and export or print only matching lines.
+
+#### Export Filtered Logs
+
+```dart
+    FlutterLogs.exportFilteredLogs(
+      keywords: ['ERROR', 'login', 'failed'],
+      filterType: FilterType.OR,    // Match ANY keyword (use AND to match ALL)
+      exportType: ExportType.ALL,
+      ignoreCase: true,
+    );
+```
+
+#### Print Filtered Logs
+
+```dart
+    FlutterLogs.printFilteredLogs(
+      keywords: ['network', 'timeout'],
+      filterType: FilterType.AND,   // Match ALL keywords
+      exportType: ExportType.TODAY,
+      ignoreCase: true,
+    );
+```
+
+#### Filter Types
+
+| FilterType | Description |
+|------------|-------------|
+| `FilterType.OR` | Match lines containing ANY of the keywords |
+| `FilterType.AND` | Match lines containing ALL of the keywords |
 
 #### ELK Elastic Stack Schema Support
 _______________________________________________

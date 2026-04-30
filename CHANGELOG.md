@@ -1,3 +1,11 @@
+## 2.2.2
+* Added Backpressure support for high-volume logging scenarios
+* Added Redaction & Masking support for sensitive data (Email, Phone, Credit Card, JWT, IP, custom patterns)
+* Added Search & Filter functionality for logs (exportFilteredLogs, printFilteredLogs)
+* Added multiple MaskTypes: FULL_MASK, PARTIAL, HASH
+* Added custom RedactionRule support with regex patterns
+* Updated example app with comprehensive demos for all new features
+
 ## 2.2.1
 * Updated sourceCompatibility & targetCompatibility to JavaVersion.VERSION_1_8
 

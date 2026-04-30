@@ -54,7 +54,7 @@ dependencies {
     implementation  'io.reactivex.rxjava2:rxkotlin:2.2.0'
 
     //RxLogs
-    implementation "com.github.umair13adil:RxLogs:v1.0.23"
+    implementation "com.github.umair13adil:RxLogs:v1.0.27"
 
     implementation "androidx.core:core-ktx:1.9.0"
     // Kotlin + coroutines

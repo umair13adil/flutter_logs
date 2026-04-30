@@ -1,9 +1,12 @@
 package com.flutter.logs.plogs.flutter_logs
 
 import com.blackbox.plog.pLogs.exporter.ExportType
+import com.blackbox.plog.pLogs.formatter.FormatType
 import com.blackbox.plog.pLogs.formatter.TimeStampFormat
 import com.blackbox.plog.pLogs.models.LogExtension
 import com.blackbox.plog.pLogs.models.LogLevel
+import com.blackbox.plog.pLogs.redaction.BuiltInPattern
+import com.blackbox.plog.pLogs.redaction.MaskType
 import com.blackbox.plog.pLogs.structure.DirectoryStructure
 import io.flutter.plugin.common.MethodCall
 import java.io.ByteArrayInputStream
@@ -164,6 +167,36 @@ fun getTimeStampFormat(type: String?): String {
         }
     }
     return TimeStampFormat.TIME_FORMAT_24_FULL
+}
+
+fun getFormatType(type: String?): FormatType {
+    return when (type) {
+        "FORMAT_CURLY" -> FormatType.FORMAT_CURLY
+        "FORMAT_SQUARE" -> FormatType.FORMAT_SQUARE
+        "FORMAT_CSV" -> FormatType.FORMAT_CSV
+        "FORMAT_CUSTOM" -> FormatType.FORMAT_CUSTOM
+        else -> FormatType.FORMAT_CURLY
+    }
+}
+
+fun getMaskType(type: String?): MaskType {
+    return when (type) {
+        "FULL_MASK" -> MaskType.FULL_MASK
+        "HASH" -> MaskType.HASH
+        "PARTIAL" -> MaskType.PARTIAL
+        else -> MaskType.FULL_MASK
+    }
+}
+
+fun getBuiltInPattern(type: String?): BuiltInPattern? {
+    return when (type) {
+        "PHONE_NUMBER" -> BuiltInPattern.PHONE_NUMBER
+        "EMAIL" -> BuiltInPattern.EMAIL
+        "CREDIT_CARD" -> BuiltInPattern.CREDIT_CARD
+        "JWT_TOKEN" -> BuiltInPattern.JWT_TOKEN
+        "IP_ADDRESS" -> BuiltInPattern.IP_ADDRESS
+        else -> null
+    }
 }
 
 fun getParentPath(path: String): String {

@@ -34,6 +34,54 @@ enum TimeStampFormat {
 
 enum ExportType { TODAY, LAST_HOUR, WEEKS, LAST_24_HOURS, ALL }
 
+enum FilterType { AND, OR }
+
+enum FormatType { FORMAT_CURLY, FORMAT_SQUARE, FORMAT_CSV, FORMAT_CUSTOM }
+
+enum MaskType { FULL_MASK, HASH, PARTIAL }
+
+enum BuiltInPattern { PHONE_NUMBER, EMAIL, CREDIT_CARD, JWT_TOKEN, IP_ADDRESS }
+
+class RedactionRule {
+  final String name;
+  final String patternString;
+  final MaskType maskType;
+  final String? replacement;
+
+  const RedactionRule({
+    required this.name,
+    required this.patternString,
+    this.maskType = MaskType.FULL_MASK,
+    this.replacement,
+  });
+}
+
+class BackpressureConfig {
+  final int queueCapacity;
+  final int warnQueueCapacity;
+  final Map<LogLevel, int> perLevelQuotas;
+  final int quotaWindowMillis;
+
+  const BackpressureConfig({
+    this.queueCapacity = 500,
+    this.warnQueueCapacity = 750,
+    this.perLevelQuotas = const {},
+    this.quotaWindowMillis = 60000,
+  });
+}
+
+class RedactionConfig {
+  final Set<BuiltInPattern> enableBuiltInPatterns;
+  final List<RedactionRule> customRules;
+  final MaskType defaultMaskType;
+
+  const RedactionConfig({
+    this.enableBuiltInPatterns = const {},
+    this.customRules = const [],
+    this.defaultMaskType = MaskType.FULL_MASK,
+  });
+}
+
 class FlutterLogs {
   // 0 = no messages, 1 = only errors, 2 = all
   static int _debugLevel = 2;
@@ -75,7 +123,22 @@ class FlutterLogs {
       String logsExportZipFileName = "",
       String logsExportDirectoryName = "",
       int singleLogFileSize = 2,
-      bool enabled = true}) async {
+      bool enabled = true,
+      bool forceWriteLogs = true,
+      bool enableLogsWriteToFile = true,
+      FormatType formatType = FormatType.FORMAT_CURLY,
+      String customFormatOpen = " ",
+      String customFormatClose = " ",
+      int logFilesLimit = 100,
+      String nameForEventDirectory = "",
+      List<String>? autoExportLogTypes,
+      int autoExportLogTypesPeriod = 0,
+      String csvDelimiter = "",
+      bool exportFormatted = true,
+      String exportFileNamePostFix = "",
+      String exportFileNamePreFix = "",
+      BackpressureConfig? backpressureConfig,
+      RedactionConfig? redactionConfig}) async {
     var directoryStructureString = _getDirectoryStructure(directoryStructure);
     var timeStampFormatString = _getTimeStampFormat(timeStampFormat);
     var logFileExtensionString = _getLogFileExtension(logFileExtension);
@@ -107,6 +170,25 @@ class FlutterLogs {
       'exportPath': logsExportDirectoryName,
       'singleLogFileSize': singleLogFileSize,
       'enabled': enabled,
+      'forceWriteLogs': forceWriteLogs,
+      'enableLogsWriteToFile': enableLogsWriteToFile,
+      'formatType': _getFormatType(formatType),
+      'customFormatOpen': customFormatOpen,
+      'customFormatClose': customFormatClose,
+      'logFilesLimit': logFilesLimit,
+      'nameForEventDirectory': nameForEventDirectory,
+      'autoExportLogTypes': autoExportLogTypes?.join(',') ?? '',
+      'autoExportLogTypesPeriod': autoExportLogTypesPeriod,
+      'csvDelimiter': csvDelimiter,
+      'exportFormatted': exportFormatted,
+      'exportFileNamePostFix': exportFileNamePostFix,
+      'exportFileNamePreFix': exportFileNamePreFix,
+      'backpressureConfig': backpressureConfig != null
+          ? _encodeBackpressureConfig(backpressureConfig)
+          : null,
+      'redactionConfig': redactionConfig != null
+          ? _encodeRedactionConfig(redactionConfig)
+          : null,
     });
     printDebugMessage(result, 2);
     return result;
@@ -149,6 +231,7 @@ class FlutterLogs {
     String environmentId = "",
     String environmentName = "",
     String organizationId = "",
+    String organizationName = "",
     String organizationUnitId = "",
     String userId = "",
     String userName = "",
@@ -162,7 +245,7 @@ class FlutterLogs {
     String deviceBatteryPercent = "",
     String latitude = "",
     String longitude = "",
-    String labels = "",
+    Map<String, String>? labels,
   }) async {
     return await channel.invokeMethod('setMetaInfo', <String, dynamic>{
       'appId': appId,
@@ -173,6 +256,7 @@ class FlutterLogs {
       'environmentId': environmentId,
       'environmentName': environmentName,
       'organizationId': organizationId,
+      'organizationName': organizationName,
       'organizationUnitId': organizationUnitId,
       'userId': userId,
       'userName': userName,
@@ -186,7 +270,7 @@ class FlutterLogs {
       'deviceBatteryPercent': deviceBatteryPercent,
       'latitude': latitude,
       'longitude': longitude,
-      'labels': labels
+      'labels': labels ?? <String, String>{},
     });
   }
 
@@ -364,6 +448,58 @@ class FlutterLogs {
     }
   }
 
+  /// Searches all log files for lines containing [keywords] and exports only
+  /// matching lines to a zip file. Use [filterType] to require ALL keywords
+  /// to match (AND) or ANY keyword to match (OR). Set [ignoreCase] to true
+  /// for case-insensitive matching.
+  static Future<void> exportFilteredLogs({
+    required List<String> keywords,
+    FilterType filterType = FilterType.OR,
+    ExportType exportType = ExportType.ALL,
+    bool decryptBeforeExporting = false,
+    bool ignoreCase = true,
+  }) async {
+    if (keywords.isEmpty) {
+      print("Error: 'keywords' must not be empty.");
+      return;
+    }
+    final String result =
+        await channel.invokeMethod('exportFilteredLogs', <String, dynamic>{
+      'keywords': keywords.join(','),
+      'filterType': _getFilterType(filterType),
+      'exportType': _getExportType(exportType),
+      'decryptBeforeExporting': decryptBeforeExporting,
+      'ignoreCase': ignoreCase,
+    });
+    printDebugMessage(result, 2);
+  }
+
+  /// Searches all log files for lines containing [keywords] and prints only
+  /// matching lines to the debug console. Use [filterType] to require ALL
+  /// keywords to match (AND) or ANY keyword to match (OR). Set [ignoreCase]
+  /// to true for case-insensitive matching.
+  static Future<void> printFilteredLogs({
+    required List<String> keywords,
+    FilterType filterType = FilterType.OR,
+    ExportType exportType = ExportType.ALL,
+    bool decryptBeforeExporting = false,
+    bool ignoreCase = true,
+  }) async {
+    if (keywords.isEmpty) {
+      print("Error: 'keywords' must not be empty.");
+      return;
+    }
+    final String result =
+        await channel.invokeMethod('printFilteredLogs', <String, dynamic>{
+      'keywords': keywords.join(','),
+      'filterType': _getFilterType(filterType),
+      'exportType': _getExportType(exportType),
+      'decryptBeforeExporting': decryptBeforeExporting,
+      'ignoreCase': ignoreCase,
+    });
+    printDebugMessage(result, 2);
+  }
+
   static Future<void> clearLogs() async {
     final String result = await channel.invokeMethod('clearLogs');
     printDebugMessage(result, 2);
@@ -391,5 +527,45 @@ class FlutterLogs {
 
   static String _getExportType(ExportType type) {
     return type.toString().split('.').last;
+  }
+
+  static String _getFilterType(FilterType type) {
+    return type.toString().split('.').last;
+  }
+
+  static String _getFormatType(FormatType type) {
+    return type.toString().split('.').last;
+  }
+
+  static String _getMaskType(MaskType type) {
+    return type.toString().split('.').last;
+  }
+
+  static Map<String, dynamic> _encodeBackpressureConfig(
+      BackpressureConfig config) {
+    return {
+      'queueCapacity': config.queueCapacity,
+      'warnQueueCapacity': config.warnQueueCapacity,
+      'perLevelQuotas': config.perLevelQuotas
+          .map((k, v) => MapEntry(_getLogLevel(k), v)),
+      'quotaWindowMillis': config.quotaWindowMillis,
+    };
+  }
+
+  static Map<String, dynamic> _encodeRedactionConfig(RedactionConfig config) {
+    return {
+      'enableBuiltInPatterns': config.enableBuiltInPatterns
+          .map((p) => p.toString().split('.').last)
+          .toList(),
+      'customRules': config.customRules
+          .map((r) => {
+                'name': r.name,
+                'patternString': r.patternString,
+                'maskType': _getMaskType(r.maskType),
+                'replacement': r.replacement,
+              })
+          .toList(),
+      'defaultMaskType': _getMaskType(config.defaultMaskType),
+    };
   }
 }

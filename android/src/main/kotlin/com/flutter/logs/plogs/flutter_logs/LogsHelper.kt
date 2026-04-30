@@ -5,8 +5,11 @@ import com.blackbox.plog.elk.PLogMetaInfoProvider
 import com.blackbox.plog.elk.models.fields.MetaInfo
 import com.blackbox.plog.mqtt.PLogMQTTProvider
 import com.blackbox.plog.pLogs.PLog
+import com.blackbox.plog.pLogs.backpressure.BackpressureConfig
 import com.blackbox.plog.pLogs.config.LogsConfig
 import com.blackbox.plog.pLogs.models.LogLevel
+import com.blackbox.plog.pLogs.redaction.RedactionConfig
+import com.blackbox.plog.pLogs.redaction.RedactionRule
 import com.blackbox.plog.utils.DateTimeUtils
 import java.io.File
 import java.io.InputStream
@@ -40,7 +43,52 @@ object LogsHelper {
                     zipFileName: String?,
                     exportPath: String?,
                     singleLogFileSize: Int?,
-                    enabled: Boolean?) {
+                    enabled: Boolean?,
+                    forceWriteLogs: Boolean?,
+                    enableLogsWriteToFile: Boolean?,
+                    formatType: String?,
+                    customFormatOpen: String?,
+                    customFormatClose: String?,
+                    logFilesLimit: Int?,
+                    nameForEventDirectory: String?,
+                    autoExportLogTypes: ArrayList<String>,
+                    autoExportLogTypesPeriod: Int?,
+                    csvDelimiter: String?,
+                    exportFormatted: Boolean?,
+                    exportFileNamePostFix: String?,
+                    exportFileNamePreFix: String?,
+                    backpressureConfigMap: Map<String, Any>?,
+                    redactionConfigMap: Map<String, Any>?) {
+
+        val backpressure = backpressureConfigMap?.let { map ->
+            BackpressureConfig(
+                queueCapacity = (map["queueCapacity"] as? Int) ?: 500,
+                warnQueueCapacity = (map["warnQueueCapacity"] as? Int) ?: 750,
+                perLevelQuotas = ((map["perLevelQuotas"] as? Map<*, *>)?.entries?.associate { (k, v) ->
+                    getLogLevel(k as? String) to ((v as? Int) ?: 0)
+                }) ?: emptyMap(),
+                quotaWindowMillis = ((map["quotaWindowMillis"] as? Int)?.toLong()) ?: 60_000L
+            )
+        }
+
+        val redaction = redactionConfigMap?.let { map ->
+            RedactionConfig(
+                enableBuiltInPatterns = ((map["enableBuiltInPatterns"] as? List<*>)?.mapNotNull { p ->
+                    getBuiltInPattern(p as? String)
+                }?.toSet()) ?: emptySet(),
+                customRules = ((map["customRules"] as? List<*>)?.mapNotNull { r ->
+                    (r as? Map<*, *>)?.let { ruleMap ->
+                        RedactionRule(
+                            name = ruleMap["name"] as? String ?: "",
+                            patternString = ruleMap["patternString"] as? String ?: "",
+                            maskType = getMaskType(ruleMap["maskType"] as? String),
+                            replacement = ruleMap["replacement"] as? String
+                        )
+                    }
+                }) ?: emptyList(),
+                defaultMaskType = getMaskType(map["defaultMaskType"] as? String)
+            )
+        }
 
         val config = LogsConfig(
                 logLevelsEnabled = logLevelsEnabled,
@@ -65,13 +113,28 @@ object LogsHelper {
                 zipFileName = zipFileName ?: "",
                 exportPath = File(context.getExternalFilesDir(null), savePath + File.separator + exportPath).path,
                 singleLogFileSize = singleLogFileSize ?: 1,
-                isEnabled = enabled ?: true
+                isEnabled = enabled ?: true,
+                forceWriteLogs = forceWriteLogs ?: true,
+                enableLogsWriteToFile = enableLogsWriteToFile ?: true,
+                formatType = getFormatType(formatType),
+                customFormatOpen = customFormatOpen ?: " ",
+                customFormatClose = customFormatClose ?: " ",
+                logFilesLimit = logFilesLimit ?: 100,
+                nameForEventDirectory = nameForEventDirectory ?: "",
+                autoExportLogTypes = autoExportLogTypes,
+                autoExportLogTypesPeriod = autoExportLogTypesPeriod ?: 0,
+                csvDelimiter = csvDelimiter ?: "",
+                exportFormatted = exportFormatted ?: true,
+                exportFileNamePostFix = exportFileNamePostFix ?: "",
+                exportFileNamePreFix = exportFileNamePreFix ?: "",
+                backpressureConfig = backpressure,
+                redactionConfig = redaction
         )
 
         savePath?.let {
             this.savePathProvided = it
         }
-        
+
         exportPath?.let {
             this.exportPathProvided = it
         }
@@ -114,6 +177,7 @@ object LogsHelper {
                          environmentId: String?,
                          environmentName: String?,
                          organizationId: String?,
+                         organizationName: String?,
                          organizationUnitId: String?,
                          language: String?,
                          userId: String?,
@@ -127,7 +191,8 @@ object LogsHelper {
                          deviceSdkInt: String?,
                          deviceBatteryPercent: String?,
                          latitude: String?,
-                         longitude: String?
+                         longitude: String?,
+                         labels: Map<String, String>?
     ) {
 
         PLogMetaInfoProvider.elkStackSupported = true
@@ -141,6 +206,7 @@ object LogsHelper {
                         environmentId = environmentId ?: "",
                         environmentName = environmentName ?: "",
                         organizationId = organizationId ?: "",
+                        organizationName = organizationName ?: "",
                         organizationUnitId = organizationUnitId ?: "",
                         language = language ?: "",
                         userId = userId ?: "",
@@ -154,8 +220,8 @@ object LogsHelper {
                         deviceSdkInt = deviceSdkInt ?: "",
                         batteryPercent = deviceBatteryPercent ?: "",
                         latitude = latitude?.toDouble() ?: 0.0,
-                        longitude = longitude?.toDouble() ?: 0.0
-                        //labels = labels ?: ""
+                        longitude = longitude?.toDouble() ?: 0.0,
+                        labels = HashMap(labels ?: emptyMap())
                 )
         )
     }

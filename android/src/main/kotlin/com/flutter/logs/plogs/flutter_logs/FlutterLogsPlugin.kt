@@ -71,6 +71,21 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware {
                         val exportPath = getStringValueById("exportPath", call)
                         val singleLogFileSize = getIntValueById("singleLogFileSize", call)
                         val enabled = getBoolValueById("enabled", call)
+                        val forceWriteLogs = getBoolValueById("forceWriteLogs", call)
+                        val enableLogsWriteToFile = getBoolValueById("enableLogsWriteToFile", call)
+                        val formatType = getStringValueById("formatType", call)
+                        val customFormatOpen = getStringValueById("customFormatOpen", call)
+                        val customFormatClose = getStringValueById("customFormatClose", call)
+                        val logFilesLimit = getIntValueById("logFilesLimit", call)
+                        val nameForEventDirectory = getStringValueById("nameForEventDirectory", call)
+                        val autoExportLogTypes = getListOfStringById("autoExportLogTypes", call)
+                        val autoExportLogTypesPeriod = getIntValueById("autoExportLogTypesPeriod", call)
+                        val csvDelimiter = getStringValueById("csvDelimiter", call)
+                        val exportFormatted = getBoolValueById("exportFormatted", call)
+                        val exportFileNamePostFix = getStringValueById("exportFileNamePostFix", call)
+                        val exportFileNamePreFix = getStringValueById("exportFileNamePreFix", call)
+                        val backpressureConfigMap = call.argument<Map<String, Any>>("backpressureConfig")
+                        val redactionConfigMap = call.argument<Map<String, Any>>("redactionConfig")
 
                         LogsHelper.setUpLogger(
                                 context = context,
@@ -96,7 +111,22 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware {
                                 zipFileName = zipFileName,
                                 exportPath = exportPath,
                                 singleLogFileSize = singleLogFileSize,
-                                enabled = enabled)
+                                enabled = enabled,
+                                forceWriteLogs = forceWriteLogs,
+                                enableLogsWriteToFile = enableLogsWriteToFile,
+                                formatType = formatType,
+                                customFormatOpen = customFormatOpen,
+                                customFormatClose = customFormatClose,
+                                logFilesLimit = logFilesLimit,
+                                nameForEventDirectory = nameForEventDirectory,
+                                autoExportLogTypes = autoExportLogTypes,
+                                autoExportLogTypesPeriod = autoExportLogTypesPeriod,
+                                csvDelimiter = csvDelimiter,
+                                exportFormatted = exportFormatted,
+                                exportFileNamePostFix = exportFileNamePostFix,
+                                exportFileNamePreFix = exportFileNamePreFix,
+                                backpressureConfigMap = backpressureConfigMap,
+                                redactionConfigMap = redactionConfigMap)
 
                         result.success("Logs Configuration added.")
                     }
@@ -135,6 +165,7 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware {
                         val environmentId = getStringValueById("environmentId", call)
                         val environmentName = getStringValueById("environmentName", call)
                         val organizationId = getStringValueById("organizationId", call)
+                        val organizationName = getStringValueById("organizationName", call)
                         val organizationUnitId = getStringValueById("organizationUnitId", call)
                         val userId = getStringValueById("userId", call)
                         val userName = getStringValueById("userName", call)
@@ -148,7 +179,8 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware {
                         val deviceBatteryPercent = getStringValueById("deviceBatteryPercent", call)
                         val latitude = getStringValueById("latitude", call)
                         val longitude = getStringValueById("longitude", call)
-                        val labels = getStringValueById("labels", call)
+                        @Suppress("UNCHECKED_CAST")
+                        val labels = call.argument<Map<String, String>>("labels") ?: emptyMap()
 
                         LogsHelper.setupForELKStack(
                                 appId = appId,
@@ -158,6 +190,7 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware {
                                 environmentId = environmentId,
                                 environmentName = environmentName,
                                 organizationId = organizationId,
+                                organizationName = organizationName,
                                 organizationUnitId = organizationUnitId,
                                 language = language,
                                 userId = userId,
@@ -171,7 +204,8 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware {
                                 deviceSdkInt = deviceSdkInt,
                                 deviceBatteryPercent = deviceBatteryPercent,
                                 latitude = latitude,
-                                longitude = longitude
+                                longitude = longitude,
+                                labels = labels
                         )
 
                         result.success("Logs MetaInfo added for ELK stack.")
@@ -323,6 +357,64 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware {
                                         },
                                         onComplete = { }
                                 )
+                    }
+                    "exportFilteredLogs" -> {
+                        val keywords = getListOfStringById("keywords", call)
+                        val filterType = getStringValueById("filterType", call)
+                        val ignoreCase = getBoolValueById("ignoreCase", call)
+                        val exportType = getStringValueById("exportType", call)
+                        val decryptBeforeExporting = getBoolValueById("decryptBeforeExporting", call)
+
+                        PLog.exportFilteredLogs(
+                            keywords = keywords,
+                            filterType = filterType,
+                            ignoreCase = ignoreCase,
+                            type = getExportType(exportType),
+                            exportDecrypted = decryptBeforeExporting
+                        )
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribeBy(
+                                onNext = {
+                                    PLog.logThis(TAG, "exportFilteredLogs", "Filtered Logs Path: ${getParentPath(it)}", LogLevel.INFO)
+                                    channel?.invokeMethod("logsExported", getParentPath(it))
+                                },
+                                onError = {
+                                    it.printStackTrace()
+                                    PLog.logThis(TAG, "exportFilteredLogs", "Error: ${it.message}", LogLevel.ERROR)
+                                    channel?.invokeMethod("logsExported", it.message)
+                                },
+                                onComplete = { }
+                            )
+                    }
+                    "printFilteredLogs" -> {
+                        val keywords = getListOfStringById("keywords", call)
+                        val filterType = getStringValueById("filterType", call)
+                        val ignoreCase = getBoolValueById("ignoreCase", call)
+                        val exportType = getStringValueById("exportType", call)
+                        val decryptBeforeExporting = getBoolValueById("decryptBeforeExporting", call)
+
+                        PLog.printFilteredLogs(
+                            keywords = keywords,
+                            filterType = filterType,
+                            ignoreCase = ignoreCase,
+                            type = getExportType(exportType),
+                            printDecrypted = decryptBeforeExporting
+                        )
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribeBy(
+                                onNext = {
+                                    Log.i("printFilteredLogs", it)
+                                    channel?.invokeMethod("logsPrinted", it)
+                                },
+                                onError = {
+                                    it.printStackTrace()
+                                    PLog.logThis(TAG, "printFilteredLogs", "Error: ${it.message}", LogLevel.ERROR)
+                                    channel?.invokeMethod("logsPrinted", it.message)
+                                },
+                                onComplete = { }
+                            )
                     }
                     "clearLogs" -> {
                         PLog.clearLogs()
