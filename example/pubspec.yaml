@@ -1,7 +1,6 @@
 name: flutter_logs_example
 description: Demonstrates how to use the flutter_logs plugin.
 version: 1.0.0
-publish_to: 'none'
 repository: https://github.com/umair13adil/flutter_logs
 
 environment:
