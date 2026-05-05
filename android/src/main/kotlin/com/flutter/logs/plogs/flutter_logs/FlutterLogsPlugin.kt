@@ -2,6 +2,8 @@ package com.flutter.logs.plogs.flutter_logs
 
 import android.app.Activity
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.annotation.NonNull
 import com.blackbox.plog.pLogs.PLog
@@ -443,17 +445,19 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware {
         }
 
         private fun invokeChannelMethod(method: String, args: Any?) {
-            channel?.invokeMethod(method, args, object : MethodChannel.Result {
-                override fun success(result: Any?) {
-                    Log.d(TAG, "invokeMethod '$method': delivered to Dart successfully")
-                }
-                override fun error(errorCode: String, errorMessage: String?, errorDetails: Any?) {
-                    Log.e(TAG, "invokeMethod '$method': Dart error [$errorCode] $errorMessage")
-                }
-                override fun notImplemented() {
-                    Log.e(TAG, "invokeMethod '$method': no handler on Dart side — setMethodCallHandler not registered before export")
-                }
-            })
+            Handler(Looper.getMainLooper()).post {
+                channel?.invokeMethod(method, args, object : MethodChannel.Result {
+                    override fun success(result: Any?) {
+                        Log.d(TAG, "invokeMethod '$method': delivered to Dart successfully")
+                    }
+                    override fun error(errorCode: String, errorMessage: String?, errorDetails: Any?) {
+                        Log.e(TAG, "invokeMethod '$method': Dart error [$errorCode] $errorMessage")
+                    }
+                    override fun notImplemented() {
+                        Log.e(TAG, "invokeMethod '$method': no handler on Dart side — setMethodCallHandler not registered before export")
+                    }
+                })
+            }
         }
 
     }

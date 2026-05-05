@@ -1,3 +1,6 @@
+## 2.2.6
+* Wrapped all Native→Dart `invokeMethod` calls in `Handler(Looper.getMainLooper()).post { }` inside the shared `invokeChannelMethod` helper — guarantees main-thread dispatch regardless of the thread the RxJava subscription delivers on, preventing potential `IllegalStateException` crashes on devices where the observable completes off the main thread
+
 ## 2.2.5
 * Added `MethodChannel.Result` callback to all Native→Dart `invokeMethod` calls (`logsExported`, `logsPrinted`) via a shared `invokeChannelMethod` helper — delivery outcome (success, Dart-side error, or missing handler) is now logged to Logcat under the `FlutterLogsPlugin` tag, making it straightforward to diagnose cases where `setMethodCallHandler` was not registered before export was triggered
 
