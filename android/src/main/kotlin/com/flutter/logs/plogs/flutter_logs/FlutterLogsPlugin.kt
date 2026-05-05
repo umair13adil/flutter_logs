@@ -264,8 +264,11 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware {
                                 .subscribeBy(
                                         onNext = {
                                             PLog.logThis(TAG, "exportPLogs", "PLogs Path: ${getParentPath(it)}", LogLevel.INFO)
-
-                                            channel?.invokeMethod("logsExported", "${getParentPath(it)}")
+                                            if (channel != null) {
+                                                channel?.invokeMethod("logsExported", "${getParentPath(it)}")
+                                            } else {
+                                                Log.e(TAG, "exportLogs: channel is null, cannot invoke logsExported callback")
+                                            }
                                         },
                                         onError = {
                                             it.printStackTrace()
@@ -274,6 +277,7 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware {
                                         },
                                         onComplete = { }
                                 )
+                        result.success(null)
                     }
                     "exportFileLogForName" -> {
                         val logFileName = getStringValueById("logFileName", call)
@@ -295,6 +299,7 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware {
                                         },
                                         onComplete = { }
                                 )
+                        result.success(null)
                     }
                     "exportAllFileLogs" -> {
                         val decryptBeforeExporting = getBoolValueById("decryptBeforeExporting", call)
@@ -315,6 +320,7 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware {
                                         },
                                         onComplete = { }
                                 )
+                        result.success(null)
                     }
                     "printLogs" -> {
                         val exportType = getStringValueById("exportType", call)
@@ -386,6 +392,7 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware {
                                 },
                                 onComplete = { }
                             )
+                        result.success(null)
                     }
                     "printFilteredLogs" -> {
                         val keywords = getListOfStringById("keywords", call)

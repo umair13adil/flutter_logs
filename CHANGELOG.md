@@ -1,3 +1,7 @@
+## 2.2.3
+* Fixed missing `result.success()` reply in `exportLogs`, `exportFileLogForName`, `exportAllFileLogs`, and `exportFilteredLogs` handlers — the omission caused the Dart-side channel call to hang indefinitely, which could silently suppress the `logsExported` callback from ever reaching the client app
+* Added diagnostic logging when the method channel is unexpectedly null during a log export
+
 ## 2.2.2
 * Added Backpressure support for high-volume logging scenarios
 * Added Redaction & Masking support for sensitive data (Email, Phone, Credit Card, JWT, IP, custom patterns)
