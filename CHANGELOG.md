@@ -1,3 +1,6 @@
+## 2.2.5
+* Added `MethodChannel.Result` callback to all Native→Dart `invokeMethod` calls (`logsExported`, `logsPrinted`) via a shared `invokeChannelMethod` helper — delivery outcome (success, Dart-side error, or missing handler) is now logged to Logcat under the `FlutterLogsPlugin` tag, making it straightforward to diagnose cases where `setMethodCallHandler` was not registered before export was triggered
+
 ## 2.2.4
 * Fixed runtime type error (`type 'Null' is not a subtype of type 'String'`) in `exportLogs` — `invokeMethod` return type is now correctly declared as nullable (`String?`) with a safe fallback, preventing crashes when the native side returns null
 

@@ -265,7 +265,7 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware {
                                         onNext = {
                                             PLog.logThis(TAG, "exportPLogs", "PLogs Path: ${getParentPath(it)}", LogLevel.INFO)
                                             if (channel != null) {
-                                                channel?.invokeMethod("logsExported", "${getParentPath(it)}")
+                                                invokeChannelMethod("logsExported", "${getParentPath(it)}")
                                             } else {
                                                 Log.e(TAG, "exportLogs: channel is null, cannot invoke logsExported callback")
                                             }
@@ -273,7 +273,7 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware {
                                         onError = {
                                             it.printStackTrace()
                                             PLog.logThis(TAG, "exportPLogs", "PLog Error: " + it.message, LogLevel.ERROR)
-                                            channel?.invokeMethod("logsExported", it.message)
+                                            invokeChannelMethod("logsExported", it.message)
                                         },
                                         onComplete = { }
                                 )
@@ -290,12 +290,12 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware {
                                         onNext = {
                                             PLog.logThis(TAG, "exportFileLogForName", "DataLog Path: ${getParentPath(it)}", LogLevel.INFO)
 
-                                            channel?.invokeMethod("logsExported", "${getParentPath(it)}")
+                                            invokeChannelMethod("logsExported", "${getParentPath(it)}")
                                         },
                                         onError = {
                                             it.printStackTrace()
                                             PLog.logThis(TAG, "exportFileLogForName", "DataLogger Error: " + it.message, LogLevel.ERROR)
-                                            channel?.invokeMethod("logsExported", it.message)
+                                            invokeChannelMethod("logsExported", it.message)
                                         },
                                         onComplete = { }
                                 )
@@ -311,12 +311,12 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware {
                                         onNext = {
                                             PLog.logThis(TAG, "exportAllFileLogs", "DataLog Path: ${getParentPath(it)}", LogLevel.INFO)
 
-                                            channel?.invokeMethod("logsExported", "${getParentPath(it)}")
+                                            invokeChannelMethod("logsExported", "${getParentPath(it)}")
                                         },
                                         onError = {
                                             it.printStackTrace()
                                             PLog.logThis(TAG, "exportAllFileLogs", "DataLogger Error: " + it.message, LogLevel.ERROR)
-                                            channel?.invokeMethod("logsExported", it.message)
+                                            invokeChannelMethod("logsExported", it.message)
                                         },
                                         onComplete = { }
                                 )
@@ -333,12 +333,12 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware {
                                         onNext = {
                                             Log.i("printLogs", it)
 
-                                            channel?.invokeMethod("logsPrinted", it)
+                                            invokeChannelMethod("logsPrinted", it)
                                         },
                                         onError = {
                                             it.printStackTrace()
                                             PLog.logThis(TAG, "printLogs", "PLog Error: " + it.message, LogLevel.ERROR)
-                                            channel?.invokeMethod("logsPrinted", it.message)
+                                            invokeChannelMethod("logsPrinted", it.message)
                                         },
                                         onComplete = { }
                                 )
@@ -354,12 +354,12 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware {
                                         onNext = {
                                             Log.i("printFileLogForName", it)
 
-                                            channel?.invokeMethod("logsPrinted", it)
+                                            invokeChannelMethod("logsPrinted", it)
                                         },
                                         onError = {
                                             it.printStackTrace()
                                             PLog.logThis(TAG, "printFileLogForName", "DataLogger Error: " + it.message, LogLevel.ERROR)
-                                            channel?.invokeMethod("logsPrinted", it.message)
+                                            invokeChannelMethod("logsPrinted", it.message)
                                         },
                                         onComplete = { }
                                 )
@@ -383,12 +383,12 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware {
                             .subscribeBy(
                                 onNext = {
                                     PLog.logThis(TAG, "exportFilteredLogs", "Filtered Logs Path: ${getParentPath(it)}", LogLevel.INFO)
-                                    channel?.invokeMethod("logsExported", getParentPath(it))
+                                    invokeChannelMethod("logsExported", getParentPath(it))
                                 },
                                 onError = {
                                     it.printStackTrace()
                                     PLog.logThis(TAG, "exportFilteredLogs", "Error: ${it.message}", LogLevel.ERROR)
-                                    channel?.invokeMethod("logsExported", it.message)
+                                    invokeChannelMethod("logsExported", it.message)
                                 },
                                 onComplete = { }
                             )
@@ -413,12 +413,12 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware {
                             .subscribeBy(
                                 onNext = {
                                     Log.i("printFilteredLogs", it)
-                                    channel?.invokeMethod("logsPrinted", it)
+                                    invokeChannelMethod("logsPrinted", it)
                                 },
                                 onError = {
                                     it.printStackTrace()
                                     PLog.logThis(TAG, "printFilteredLogs", "Error: ${it.message}", LogLevel.ERROR)
-                                    channel?.invokeMethod("logsPrinted", it.message)
+                                    invokeChannelMethod("logsPrinted", it.message)
                                 },
                                 onComplete = { }
                             )
@@ -441,7 +441,21 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware {
                 }
             })
         }
-        
+
+        private fun invokeChannelMethod(method: String, args: Any?) {
+            channel?.invokeMethod(method, args, object : MethodChannel.Result {
+                override fun success(result: Any?) {
+                    Log.d(TAG, "invokeMethod '$method': delivered to Dart successfully")
+                }
+                override fun error(errorCode: String, errorMessage: String?, errorDetails: Any?) {
+                    Log.e(TAG, "invokeMethod '$method': Dart error [$errorCode] $errorMessage")
+                }
+                override fun notImplemented() {
+                    Log.e(TAG, "invokeMethod '$method': no handler on Dart side — setMethodCallHandler not registered before export")
+                }
+            })
+        }
+
     }
 
     override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
