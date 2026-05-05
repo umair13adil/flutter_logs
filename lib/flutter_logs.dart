@@ -394,12 +394,12 @@ class FlutterLogs {
   static Future<void> exportLogs(
       {ExportType exportType = ExportType.ALL,
       bool decryptBeforeExporting = false}) async {
-    final String result =
-        await channel.invokeMethod('exportLogs', <String, dynamic>{
+    final String? result =
+        await channel.invokeMethod<String>('exportLogs', <String, dynamic>{
       'exportType': _getExportType(exportType),
       'decryptBeforeExporting': decryptBeforeExporting
     });
-    printDebugMessage(result, 2);
+    printDebugMessage(result ?? '', 2);
   }
 
   static Future<void> printLogs(

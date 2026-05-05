@@ -1,3 +1,6 @@
+## 2.2.4
+* Fixed runtime type error (`type 'Null' is not a subtype of type 'String'`) in `exportLogs` — `invokeMethod` return type is now correctly declared as nullable (`String?`) with a safe fallback, preventing crashes when the native side returns null
+
 ## 2.2.3
 * Fixed missing `result.success()` reply in `exportLogs`, `exportFileLogForName`, `exportAllFileLogs`, and `exportFilteredLogs` handlers — the omission caused the Dart-side channel call to hang indefinitely, which could silently suppress the `logsExported` callback from ever reaching the client app
 * Added diagnostic logging when the method channel is unexpectedly null during a log export
