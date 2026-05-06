@@ -11,8 +11,12 @@ Flutter Logs provides quick & simple file based logging solution. All logs are s
 Flutter logs can work with Logstash by writing JSON delimited logs to log files. The format is based on ELK schema. You can also send logs in real-time to server using MQTT. MQTT configuration can be applied on Logstash to receive & view logs on kibana dashboard. 
 
 ![Image1](pictures/picture1.png)
-![Image4](pictures/picture4.png)
-![Image5](pictures/picture5.png)
+
+| Options 1 | Options 2 |
+| :---: | :---: |
+| ![Image4](pictures/picture4.png) | ![Image5](pictures/picture5.png) |
+
+
 
 ##### Read more about flutter_logs usage on this Medium article: 
 
