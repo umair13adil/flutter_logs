@@ -1,3 +1,10 @@
+## 2.2.7
+* Refactored `FlutterLogsPlugin` to modern Flutter plugin standards — all state (`channel`, `eventChannel`, `applicationContext`) moved from static `companion object` fields to instance fields, eliminating potential memory leaks when the engine is detached and re-attached
+* Removed `@JvmStatic` annotations; `setUpPluginMethods` and `invokeChannelMethod` are now private instance methods, consistent with the `FlutterPlugin` embedding API contract
+* Channels are explicitly nulled out in `onDetachedFromEngine` to prevent stale reference retention
+* Removed unused imports (`Activity`, `PluginRegistry`)
+* Simplified example `MainActivity` — removed redundant `onCreate` override; `FlutterActivity` handles initialization automatically
+
 ## 2.2.6
 * Wrapped all Native→Dart `invokeMethod` calls in `Handler(Looper.getMainLooper()).post { }` inside the shared `invokeChannelMethod` helper — guarantees main-thread dispatch regardless of the thread the RxJava subscription delivers on, preventing potential `IllegalStateException` crashes on devices where the observable completes off the main thread
 
