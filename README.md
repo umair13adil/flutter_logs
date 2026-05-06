@@ -53,7 +53,7 @@ In your pubspec.yaml
 
 ```yaml
 dependencies:
-    flutter_logs: ^2.2.2
+    flutter_logs: [Latest]
 ```
 
 ```dart
