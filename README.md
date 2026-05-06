@@ -11,6 +11,8 @@ Flutter Logs provides quick & simple file based logging solution. All logs are s
 Flutter logs can work with Logstash by writing JSON delimited logs to log files. The format is based on ELK schema. You can also send logs in real-time to server using MQTT. MQTT configuration can be applied on Logstash to receive & view logs on kibana dashboard. 
 
 ![Image1](pictures/picture1.png)
+![Image4](pictures/picture4.png)
+![Image5](pictures/picture5.png)
 
 ##### Read more about flutter_logs usage on this Medium article: 
 
@@ -65,40 +67,143 @@ import 'package:flutter_logs/flutter_logs.dart';
 #### Initialization
 _______________________________________________
 
-In your main.dart file add like this:
+Call `FlutterLogs.initLogs` before `runApp`. Three parameters are required; everything else has a default.
 
 ```dart
-   
-   import 'package:flutter_logs/flutter_logs.dart';
+import 'package:flutter_logs/flutter_logs.dart';
 
-   Future<void> main() async {
-     WidgetsFlutterBinding.ensureInitialized();
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
 
-     //Initialize Logging
-     await FlutterLogs.initLogs(
-     logLevelsEnabled: [
-       LogLevel.INFO,
-       LogLevel.WARNING,
-       LogLevel.ERROR,
-       LogLevel.SEVERE
-     ],
-     timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
-     directoryStructure: DirectoryStructure.FOR_DATE,
-     logTypesEnabled: ["device","network","errors"],
-     logFileExtension: LogFileExtension.LOG,
-     logsWriteDirectoryName: "MyLogs",
-     logsExportDirectoryName: "MyLogs/Exported",
-     debugFileOperations: true,
-     isDebuggable: true,
-     logsRetentionPeriodInDays = 14,
-     zipsRetentionPeriodInDays = 3,
-     autoDeleteZipOnExport = false,
-     autoClearLogs = true,
-             enabled: true);
+  await FlutterLogs.initLogs(
+    // --- required ---
+    directoryStructure: DirectoryStructure.FOR_DATE,
+    timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
+    logFileExtension: LogFileExtension.LOG,
 
-     runApp(MyApp());
-   }
+    // --- commonly set ---
+    logLevelsEnabled: [
+      LogLevel.INFO,
+      LogLevel.WARNING,
+      LogLevel.ERROR,
+      LogLevel.SEVERE,
+    ],
+    logTypesEnabled: ["device", "network", "errors"],
+    logsWriteDirectoryName: "MyLogs",
+    logsExportDirectoryName: "MyLogs/Exported",
+    logsRetentionPeriodInDays: 14,
+    isDebuggable: true,
+  );
+
+  runApp(MyApp());
+}
 ```
+
+#### `initLogs` — Full Parameter Reference
+_______________________________________________
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `directoryStructure` | `DirectoryStructure` | **required** | How log files are arranged on disk. See values below. |
+| `timeStampFormat` | `TimeStampFormat` | **required** | Timestamp format appended to each log entry. See values below. |
+| `logFileExtension` | `LogFileExtension` | **required** | File extension for log files. See values below. |
+| `logLevelsEnabled` | `List<LogLevel>?` | `null` (all) | Which log levels are written to file. Omit to enable all levels. |
+| `logTypesEnabled` | `List<String>?` | `null` | Names of custom log-type files (used with `logToFile`). |
+| `logsRetentionPeriodInDays` | `int` | `14` | Log files older than this are deleted automatically. |
+| `zipsRetentionPeriodInDays` | `int` | `3` | Exported zip files older than this are deleted automatically. |
+| `autoDeleteZipOnExport` | `bool` | `false` | Delete the zip file from the export directory after a successful export. |
+| `autoClearLogs` | `bool` | `true` | Automatically clear log files when retention period expires. |
+| `autoExportErrors` | `bool` | `true` | Automatically export `ERROR`/`SEVERE` logs when they occur. |
+| `encryptionEnabled` | `bool` | `false` | Encrypt log files on disk. Requires `encryptionKey`. |
+| `encryptionKey` | `String` | `""` | AES encryption key. Only used when `encryptionEnabled` is `true`. |
+| `logSystemCrashes` | `bool` | `true` | Capture uncaught exceptions and log them automatically. |
+| `isDebuggable` | `bool` | `true` | Print internal plugin debug messages to the console. |
+| `debugFileOperations` | `bool` | `true` | Log file read/write operations to the console for tracing. |
+| `attachTimeStamp` | `bool` | `true` | Prepend a timestamp to each log entry. |
+| `attachNoOfFiles` | `bool` | `true` | Append the current file count to each log entry. |
+| `zipFilesOnly` | `bool` | `false` | Export logs as a zip even when a single file would suffice. |
+| `logsWriteDirectoryName` | `String` | `""` | Subdirectory name inside app storage where logs are written. |
+| `logsExportZipFileName` | `String` | `""` | Custom name for the exported zip file (without extension). |
+| `logsExportDirectoryName` | `String` | `""` | Subdirectory inside app storage where exported zips are placed. |
+| `singleLogFileSize` | `int` | `2` | Maximum size of a single log file in MB before a new one is created. |
+| `enabled` | `bool` | `true` | Master switch — set to `false` to disable all logging without changing config. |
+| `forceWriteLogs` | `bool` | `true` | Write logs immediately even when the internal buffer is not full. |
+| `enableLogsWriteToFile` | `bool` | `true` | Write log entries to files. Disable to log to console only. |
+| `formatType` | `FormatType` | `FORMAT_CURLY` | Structure of each log entry. See values below. |
+| `customFormatOpen` | `String` | `" "` | Opening delimiter used when `formatType` is `FORMAT_CUSTOM`. |
+| `customFormatClose` | `String` | `" "` | Closing delimiter used when `formatType` is `FORMAT_CUSTOM`. |
+| `logFilesLimit` | `int` | `100` | Maximum number of log files kept on disk before the oldest are removed. |
+| `nameForEventDirectory` | `String` | `""` | Directory name for event logs. Used when `directoryStructure` is `FOR_EVENT`. |
+| `autoExportLogTypes` | `List<String>?` | `null` | Log-type names that are exported automatically on a timer. |
+| `autoExportLogTypesPeriod` | `int` | `0` | Interval in minutes between automatic exports. `0` disables the timer. |
+| `csvDelimiter` | `String` | `""` | Column separator used when `formatType` is `FORMAT_CSV`. |
+| `exportFormatted` | `bool` | `true` | Apply formatting rules when exporting (pretty-print). |
+| `exportFileNamePreFix` | `String` | `""` | String prepended to the exported zip file name. |
+| `exportFileNamePostFix` | `String` | `""` | String appended to the exported zip file name. |
+| `backpressureConfig` | `BackpressureConfig?` | `null` | Queue and per-level quota settings for high-volume logging. See [Backpressure](#backpressure-support) below. |
+| `redactionConfig` | `RedactionConfig?` | `null` | PII masking rules applied before writing each log entry. See [Redaction](#redaction--masking-pii-protection) below. |
+
+#### Enum Values
+_______________________________________________
+
+**`DirectoryStructure`**
+
+| Value | Description |
+|-------|-------------|
+| `FOR_DATE` | One directory per date, one file per hour inside it. |
+| `FOR_EVENT` | All logs grouped into a single named event directory (`nameForEventDirectory`). |
+| `SINGLE_FILE_FOR_DAY` | One log file per day. |
+
+**`TimeStampFormat`**
+
+| Value | Example output |
+|-------|---------------|
+| `DATE_FORMAT_1` | `2024-01-15` |
+| `DATE_FORMAT_2` | `15-01-2024` |
+| `TIME_FORMAT_FULL_JOINED` | `150120241030` |
+| `TIME_FORMAT_FULL_1` | `15-01-2024 10:30:00` |
+| `TIME_FORMAT_FULL_2` | `15/01/2024 10:30:00` |
+| `TIME_FORMAT_24_FULL` | `2024-01-15 10:30:00` |
+| `TIME_FORMAT_READABLE` | `15 January 2024 10:30 AM` |
+| `TIME_FORMAT_READABLE_2` | `Jan 15, 2024 10:30 AM` |
+| `TIME_FORMAT_SIMPLE` | `10:30:00` |
+
+**`LogFileExtension`**
+
+| Value | Extension |
+|-------|-----------|
+| `LOG` | `.log` |
+| `TXT` | `.txt` |
+| `CSV` | `.csv` |
+| `NONE` | *(no extension)* |
+
+**`LogLevel`**
+
+| Value | Use for |
+|-------|---------|
+| `INFO` | General informational events |
+| `WARNING` | Potentially harmful situations |
+| `ERROR` | Error events that allow the app to continue |
+| `SEVERE` | Critical failures |
+
+**`FormatType`**
+
+| Value | Entry format |
+|-------|-------------|
+| `FORMAT_CURLY` | `{tag} {message} {timestamp}` |
+| `FORMAT_SQUARE` | `[tag] [message] [timestamp]` |
+| `FORMAT_CSV` | Comma-separated (or `csvDelimiter`) columns |
+| `FORMAT_CUSTOM` | Uses `customFormatOpen` / `customFormatClose` as delimiters |
+
+**`ExportType`** *(used in export calls, not `initLogs`)*
+
+| Value | Exports logs from |
+|-------|------------------|
+| `TODAY` | The current day |
+| `LAST_HOUR` | The last 60 minutes |
+| `LAST_24_HOURS` | The last 24 hours |
+| `WEEKS` | The last 7 days |
+| `ALL` | All retained log files |
 
 ## How to log data?
 
@@ -485,7 +590,7 @@ Send additional Meta info for better filtering at LogStash dashboard. With this 
       deviceSdkInt: "26",
       latitude: "0.0",
       longitude: "0.0",
-      labels: "",
+      labels: {"env": "dev"},
     );
 ```
 
