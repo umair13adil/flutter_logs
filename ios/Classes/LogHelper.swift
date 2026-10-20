@@ -29,6 +29,7 @@ class LogHelper: NSObject {
         
         guard let dirURL = Logging.defaultLogsDirectoryURL() else {
             print("Logs directory not found")
+            result("{\(TAG)} {logs} {Logs directory not found} {\(getTimeStamp())}")
             return
         }
         let dateFormatter = DateFormatter()
@@ -51,6 +52,7 @@ class LogHelper: NSObject {
         
         guard let dirURL = Logging.defaultLogsDirectoryURL() else {
             print("Logs directory not found")
+            result("{\(TAG)} {logs} {Logs directory not found} {\(getTimeStamp())}")
             return
         }
         let dateFormatter = DateFormatter()
@@ -73,6 +75,7 @@ class LogHelper: NSObject {
         let log = "{\(tag)} {\(subTag)} {\(logMessage)} {\(level)}"
         guard let dirURL = Logging.defaultLogsDirectoryURL() else {
             print("Logs directory not found")
+            result("{\(TAG)} {logs} {Logs directory not found} {\(getTimeStamp())}")
             return
         }
         let dateFormatter = DateFormatter()
@@ -88,7 +91,7 @@ class LogHelper: NSObject {
     
     static func getFiles(result: @escaping FlutterResult,eventSink: FlutterEventSink?,channel : FlutterMethodChannel?){
         guard let files = Logging.fileURLs  else {
-            result("{\(TAG)} {getFiles} {No Files found!} {\(getTimeStamp())}")
+            exportFailed(result: result, channel: channel, message: "{\(TAG)} {getFiles} {No Files found!} {\(getTimeStamp())}")
             return
         }
         
@@ -100,8 +103,15 @@ class LogHelper: NSObject {
             
             zipLogs(result: result, zipName: "logs",eventSink:eventSink, channel:channel)
         }else{
-            result("{\(TAG)} {getFiles} {No Files found!} {\(getTimeStamp())}")
+            exportFailed(result: result, channel: channel, message: "{\(TAG)} {getFiles} {No Files found!} {\(getTimeStamp())}")
         }
+    }
+    
+    // Reply to the method call and notify 'logsExported' listeners of the failure, as Android does
+    static func exportFailed(result: @escaping FlutterResult, channel : FlutterMethodChannel?, message: String){
+        print(message)
+        result(message)
+        channel?.invokeMethod("logsExported", arguments: message)
     }
     
     static func printLogs(result: @escaping FlutterResult,eventSink: FlutterEventSink?,channel : FlutterMethodChannel?){
@@ -113,17 +123,24 @@ class LogHelper: NSObject {
         
         if(!files.isEmpty){
             
+            // A FlutterResult can only be replied to once, so reply after all files are printed
+            var unreadFiles = [URL]()
             files.forEach { (fileURL) in
                 //reading
                 do {
                     let text2 = try String(contentsOf: fileURL, encoding: .utf8)
-                    result("{\(TAG)} {printLogs} {Printed: \(text2)} {\(getTimeStamp())}")
                     channel?.invokeMethod("logsPrinted", arguments: text2)
                 }
                 catch {
                     print(error)
-                    result("{\(TAG)} {printLogs} {Unable to read file. \(fileURL)} {\(getTimeStamp())}")
+                    unreadFiles.append(fileURL)
                 }
+            }
+            
+            if(unreadFiles.isEmpty){
+                result("{\(TAG)} {printLogs} {Printed \(files.count) file(s)} {\(getTimeStamp())}")
+            }else{
+                result("{\(TAG)} {printLogs} {Unable to read file(s). \(unreadFiles)} {\(getTimeStamp())}")
             }
         }else{
             result("{\(TAG)} {printLogs} {No Files found!} {\(getTimeStamp())}")
@@ -186,8 +203,7 @@ class LogHelper: NSObject {
         let  path = NSSearchPathForDirectoriesInDomains(.documentDirectory,.userDomainMask,true).first!
         
         guard var sourceURL = Logging.defaultLogsDirectoryURL()  else {
-            print("{\(TAG)} {zipData} {Dir not found!} {\(getTimeStamp())}")
-            result("{\(TAG)} {zipData} {Dir not found!} {\(getTimeStamp())}")
+            exportFailed(result: result, channel: channel, message: "{\(TAG)} {zipData} {Dir not found!} {\(getTimeStamp())}")
             return
         }
         
@@ -201,8 +217,7 @@ class LogHelper: NSObject {
             let items = try fm.contentsOfDirectory(atPath: sourceURL.path)
             
             guard let archive = Archive(url: destinationURL, accessMode: .create) else  {
-                print("Unable to create an Archive!")
-                result("Unable to create an Archive!")
+                exportFailed(result: result, channel: channel, message: "Unable to create an Archive!")
                 return
             }
             
@@ -213,8 +228,7 @@ class LogHelper: NSObject {
                 try archive.addEntry(with: sourceURL.lastPathComponent, relativeTo: sourceURL.deletingLastPathComponent(), compressionMethod: CompressionMethod.deflate)
                 
                 guard Archive(url: destinationURL, accessMode: .update) != nil else  {
-                    print("Unable to update the Archive!")
-                    result("Unable to update the Archive!")
+                    exportFailed(result: result, channel: channel, message: "Unable to update the Archive!")
                     return
                 }
                 
@@ -226,8 +240,7 @@ class LogHelper: NSObject {
             result(destinationURL.lastPathComponent)
             channel?.invokeMethod("logsExported", arguments: "\(destinationURL.lastPathComponent)")
         } catch {
-            print("{\(TAG)} {zipLogs} {No Files found!} {\(getTimeStamp())}")
-            result("{\(TAG)} {zipLogs} {No Files found!} {\(getTimeStamp())}")
+            exportFailed(result: result, channel: channel, message: "{\(TAG)} {zipLogs} {\(error.localizedDescription)} {\(getTimeStamp())}")
         }
     }
 }

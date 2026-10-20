@@ -36,6 +36,7 @@ public class SwiftFlutterLogsPlugin: NSObject, FlutterPlugin {
             result("Logs Configuration added.")
         }else if call.method == "logThis" {
             guard let args = call.arguments else {
+                result("iOS could not extract flutter arguments in method: (logThis)")
                 return
             }
             if let myArgs = args as? [String: Any],
@@ -58,6 +59,7 @@ public class SwiftFlutterLogsPlugin: NSObject, FlutterPlugin {
             }
         }else if call.method == "logToFile" {
             guard let args = call.arguments else {
+                result("iOS could not extract flutter arguments in method: (logToFile)")
                 return
             }
             if let myArgs = args as? [String: Any],
@@ -72,13 +74,16 @@ public class SwiftFlutterLogsPlugin: NSObject, FlutterPlugin {
             }
         }else if call.method == "exportLogs" {
             LogHelper.getFiles(result:result,eventSink:eventSink, channel:SwiftFlutterLogsPlugin.channel)
-        }else if call.method == "exportFileLogForName" {
-            
         }else if call.method == "clearLogs" {
             LogHelper.clearLogs(result:result)
-            result("Logs are cleared.")
         }else if call.method == "printLogs" {
             LogHelper.printLogs(result:result,eventSink:eventSink, channel:SwiftFlutterLogsPlugin.channel)
+        }else if ["initMQTT", "setMetaInfo", "exportFileLogForName", "exportAllFileLogs",
+                  "printFileLogForName", "exportFilteredLogs", "printFilteredLogs"].contains(call.method) {
+            // Not implemented on iOS yet, but reply so awaiting callers don't hang
+            result("{\(LogHelper.TAG)} {\(call.method)} {Not supported on iOS} {\(LogHelper.getTimeStamp())}")
+        }else {
+            result(FlutterMethodNotImplemented)
         }
     }
 }

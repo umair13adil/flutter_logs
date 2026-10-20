@@ -1,3 +1,11 @@
+## 2.2.8
+* Fixed exporting logs a second time in the example app — it used a single static `Completer`, so later exports immediately returned the first export's (possibly deleted) zip path and the `logsExported` handler threw `Bad state: Future already completed`. A new `Completer` is now created for each export
+* Fixed `type 'Null' is not a subtype of type 'String'` errors — every Dart method except `initLogs` now treats the native reply as nullable (`String?`)
+* Android: `logThis`, `logToFile`, `printLogs`, `printFileLogForName`, `printFilteredLogs` and `clearLogs` now reply to the method call, so awaiting them no longer hangs
+* iOS: methods not yet implemented on iOS (`initMQTT`, `setMetaInfo`, `exportFileLogForName`, `exportAllFileLogs`, `printFileLogForName`, `exportFilteredLogs`, `printFilteredLogs`) now reply with a "Not supported on iOS" message instead of never replying; unknown methods return `FlutterMethodNotImplemented`
+* iOS: `logThis` and `logToFile` now reply when arguments are missing or the logs directory is not found; `clearLogs` and `printLogs` no longer reply more than once
+* iOS: export failures now send `logsExported` with the error message, matching Android, so listeners waiting for an export are always notified
+
 ## 2.2.7
 * Refactored `FlutterLogsPlugin` to modern Flutter plugin standards — all state (`channel`, `eventChannel`, `applicationContext`) moved from static `companion object` fields to instance fields, eliminating potential memory leaks when the engine is detached and re-attached
 * Removed `@JvmStatic` annotations; `setUpPluginMethods` and `invokeChannelMethod` are now private instance methods, consistent with the `FlutterPlugin` embedding API contract

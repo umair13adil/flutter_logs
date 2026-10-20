@@ -229,6 +229,7 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware {
                             }
                         }
                     }
+                    result.success(null)
                 }
                 "logToFile" -> {
                     val logFileName = getStringValueById("logFileName", call)
@@ -241,6 +242,7 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware {
                     } else {
                         LogsHelper.writeLogToFile(logFileName, logMessage, appendTimeStamp)
                     }
+                    result.success(null)
                 }
                 "exportLogs" -> {
                     val exportType = getStringValueById("exportType", call)
@@ -327,6 +329,7 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware {
                                     },
                                     onComplete = { }
                             )
+                    result.success(null)
                 }
                 "printFileLogForName" -> {
                     val logFileName = getStringValueById("logFileName", call)
@@ -347,6 +350,7 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware {
                                     },
                                     onComplete = { }
                             )
+                    result.success(null)
                 }
                 "exportFilteredLogs" -> {
                     val keywords = getListOfStringById("keywords", call)
@@ -406,9 +410,11 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware {
                             },
                             onComplete = { }
                         )
+                    result.success(null)
                 }
                 "clearLogs" -> {
                     PLog.clearLogs()
+                    result.success(null)
                 }
                 else -> result.notImplemented()
             }

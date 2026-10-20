@@ -283,7 +283,7 @@ class FlutterLogs {
       Error? error,
       String errorMessage = ""}) async {
     if (exception != null) {
-      final String result =
+      final String? result =
           await channel.invokeMethod('logThis', <String, dynamic>{
         'tag': tag,
         'subTag': subTag,
@@ -291,9 +291,9 @@ class FlutterLogs {
         'level': _getLogLevel(level),
         'e': exception.toString()
       });
-      printDebugMessage(result, 2);
+      printDebugMessage(result ?? '', 2);
     } else if (error != null) {
-      final String result =
+      final String? result =
           await channel.invokeMethod('logThis', <String, dynamic>{
         'tag': tag,
         'subTag': subTag,
@@ -301,67 +301,67 @@ class FlutterLogs {
         'level': _getLogLevel(level),
         'e': error.stackTrace.toString()
       });
-      printDebugMessage(result, 2);
+      printDebugMessage(result ?? '', 2);
     } else if (errorMessage != null && errorMessage.isNotEmpty) {
-      final String result =
+      final String? result =
           await channel.invokeMethod('logThis', <String, dynamic>{
         'tag': tag,
         'subTag': subTag,
         'logMessage': "$logMessage , Error: $errorMessage",
         'level': _getLogLevel(level)
       });
-      printDebugMessage(result, 2);
+      printDebugMessage(result ?? '', 2);
     } else {
-      final String result =
+      final String? result =
           await channel.invokeMethod('logThis', <String, dynamic>{
         'tag': tag,
         'subTag': subTag,
         'logMessage': logMessage,
         'level': _getLogLevel(level)
       });
-      printDebugMessage(result, 2);
+      printDebugMessage(result ?? '', 2);
     }
   }
 
   static Future<void> logInfo(
       String tag, String subTag, String logMessage) async {
-    final String result =
+    final String? result =
         await channel.invokeMethod('logThis', <String, dynamic>{
       'tag': tag,
       'subTag': subTag,
       'logMessage': logMessage,
       'level': _getLogLevel(LogLevel.INFO)
     });
-    printDebugMessage(result, 2);
+    printDebugMessage(result ?? '', 2);
   }
 
   static Future<void> logWarn(
       String tag, String subTag, String logMessage) async {
-    final String result =
+    final String? result =
         await channel.invokeMethod('logThis', <String, dynamic>{
       'tag': tag,
       'subTag': subTag,
       'logMessage': logMessage,
       'level': _getLogLevel(LogLevel.WARNING)
     });
-    printDebugMessage(result, 2);
+    printDebugMessage(result ?? '', 2);
   }
 
   static Future<void> logError(
       String tag, String subTag, String logMessage) async {
-    final String result =
+    final String? result =
         await channel.invokeMethod('logThis', <String, dynamic>{
       'tag': tag,
       'subTag': subTag,
       'logMessage': logMessage,
       'level': _getLogLevel(LogLevel.ERROR)
     });
-    printDebugMessage(result, 2);
+    printDebugMessage(result ?? '', 2);
   }
 
   static Future<void> logErrorTrace(
       String tag, String subTag, String logMessage, Error e) async {
-    final String result =
+    final String? result =
         await channel.invokeMethod('logThis', <String, dynamic>{
       'tag': tag,
       'subTag': subTag,
@@ -369,7 +369,7 @@ class FlutterLogs {
       'e': e.stackTrace.toString(),
       'level': _getLogLevel(LogLevel.ERROR)
     });
-    printDebugMessage(result, 2);
+    printDebugMessage(result ?? '', 2);
   }
 
   static Future<void> logToFile(
@@ -378,14 +378,14 @@ class FlutterLogs {
       String logMessage = "",
       bool appendTimeStamp = false}) async {
     if (logFileName.isNotEmpty) {
-      final String result =
+      final String? result =
           await channel.invokeMethod('logToFile', <String, dynamic>{
         'logFileName': logFileName,
         'overwrite': overwrite,
         'logMessage': logMessage,
         'appendTimeStamp': appendTimeStamp
       });
-      printDebugMessage(result, 2);
+      printDebugMessage(result ?? '', 2);
     } else {
       print("Error: \'logFileName\' required.");
     }
@@ -405,23 +405,23 @@ class FlutterLogs {
   static Future<void> printLogs(
       {ExportType exportType = ExportType.ALL,
       bool decryptBeforeExporting = false}) async {
-    final String result =
+    final String? result =
         await channel.invokeMethod('printLogs', <String, dynamic>{
       'exportType': _getExportType(exportType),
       'decryptBeforeExporting': decryptBeforeExporting
     });
-    printDebugMessage(result, 2);
+    printDebugMessage(result ?? '', 2);
   }
 
   static Future<void> exportFileLogForName(
       {String logFileName = "", bool decryptBeforeExporting = false}) async {
     if (logFileName.isNotEmpty) {
-      final String result = await channel.invokeMethod(
+      final String? result = await channel.invokeMethod(
           'exportFileLogForName', <String, dynamic>{
         'logFileName': logFileName,
         'decryptBeforeExporting': decryptBeforeExporting
       });
-      printDebugMessage(result, 2);
+      printDebugMessage(result ?? '', 2);
     } else {
       print("Error: \'logFileName\' required.");
     }
@@ -429,20 +429,20 @@ class FlutterLogs {
 
   static Future<void> exportAllFileLogs(
       {bool decryptBeforeExporting = false}) async {
-    final String result = await channel.invokeMethod('exportAllFileLogs',
+    final String? result = await channel.invokeMethod('exportAllFileLogs',
         <String, dynamic>{'decryptBeforeExporting': decryptBeforeExporting});
-    printDebugMessage(result, 2);
+    printDebugMessage(result ?? '', 2);
   }
 
   static Future<void> printFileLogForName(
       {String logFileName = "", bool decryptBeforeExporting = false}) async {
     if (logFileName.isNotEmpty) {
-      final String result = await channel.invokeMethod(
+      final String? result = await channel.invokeMethod(
           'printFileLogForName', <String, dynamic>{
         'logFileName': logFileName,
         'decryptBeforeExporting': decryptBeforeExporting
       });
-      printDebugMessage(result, 2);
+      printDebugMessage(result ?? '', 2);
     } else {
       print("Error: \'logFileName\' required.");
     }
@@ -463,7 +463,7 @@ class FlutterLogs {
       print("Error: 'keywords' must not be empty.");
       return;
     }
-    final String result =
+    final String? result =
         await channel.invokeMethod('exportFilteredLogs', <String, dynamic>{
       'keywords': keywords.join(','),
       'filterType': _getFilterType(filterType),
@@ -471,7 +471,7 @@ class FlutterLogs {
       'decryptBeforeExporting': decryptBeforeExporting,
       'ignoreCase': ignoreCase,
     });
-    printDebugMessage(result, 2);
+    printDebugMessage(result ?? '', 2);
   }
 
   /// Searches all log files for lines containing [keywords] and prints only
@@ -489,7 +489,7 @@ class FlutterLogs {
       print("Error: 'keywords' must not be empty.");
       return;
     }
-    final String result =
+    final String? result =
         await channel.invokeMethod('printFilteredLogs', <String, dynamic>{
       'keywords': keywords.join(','),
       'filterType': _getFilterType(filterType),
@@ -497,12 +497,12 @@ class FlutterLogs {
       'decryptBeforeExporting': decryptBeforeExporting,
       'ignoreCase': ignoreCase,
     });
-    printDebugMessage(result, 2);
+    printDebugMessage(result ?? '', 2);
   }
 
   static Future<void> clearLogs() async {
-    final String result = await channel.invokeMethod('clearLogs');
-    printDebugMessage(result, 2);
+    final String? result = await channel.invokeMethod('clearLogs');
+    printDebugMessage(result ?? '', 2);
   }
 
   static String _getDirectoryStructure(DirectoryStructure type) {

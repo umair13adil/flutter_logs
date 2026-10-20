@@ -19,7 +19,7 @@ class _MyAppState extends State<MyApp> {
   var _myLogFileName = "MyLogFile";
   var toggle = false;
   var logStatus = '';
-  static Completer _completer = new Completer<String>();
+  static Completer<String> _completer = Completer<String>();
 
   final TextEditingController _keywordsController = TextEditingController();
   FilterType _filterType = FilterType.OR;
@@ -72,7 +72,9 @@ class _MyAppState extends State<MyApp> {
             status: "logsExported: ${call.arguments.toString()}", append: true);
 
         // Notify Future with value
-        _completer.complete(call.arguments.toString());
+        if (!_completer.isCompleted) {
+          _completer.complete(call.arguments.toString());
+        }
       } else if (call.method == 'logsPrinted') {
         FlutterLogs.logInfo(
             _tag, "setUpLogs", "logsPrinted: ${call.arguments.toString()}");
@@ -677,8 +679,10 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<String> exportAllLogs() async {
+    // A Completer can only complete once, so create a new one per export
+    _completer = Completer<String>();
     FlutterLogs.exportLogs(exportType: ExportType.ALL);
-    return _completer.future as FutureOr<String>;
+    return _completer.future;
   }
 
   void exportFileLogs() {
