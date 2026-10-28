@@ -1,3 +1,11 @@
+## 2.2.8+agp9.1
+* Android: builds with Android Gradle Plugin 9 and built-in Kotlin (`android.builtInKotlin=true`), and still builds with AGP 8. Following Flutter's built-in Kotlin migration guide, the plugin no longer applies `kotlin-android` itself; AGP 9 provides Kotlin, and Flutter 3.44+ applies the Kotlin Gradle plugin when built-in Kotlin is off. This also removes Flutter's "plugins that apply Kotlin Gradle Plugin" warning
+* Android: replaced `android.kotlinOptions` (not available with built-in Kotlin) with a top-level `kotlin { compilerOptions { jvmTarget = JVM_1_8 } }` block, so Kotlin still targets Java 8 to match `compileOptions`
+* Android: bumped the plugin's Kotlin Gradle plugin version from 1.8.10 to 2.2.20 and removed the explicit `kotlin-stdlib-jdk7` dependency; the standard library is added automatically
+* Android: added a consumer keep rule for WorkManager's Room database constructor. Under AGP 9's R8 strict full mode, the rule shipped with Room 2.5 no longer keeps it, so release builds crashed at startup
+* Minimum versions are now Flutter 3.44 / Dart 3.12, which are required for Flutter to apply Kotlin to plugins
+* Example: now depends on the plugin by path instead of from pub.dev, and uses Kotlin 2.2.20 (the minimum for Flutter 3.47) with a larger Gradle heap
+
 ## 2.2.8
 * Fixed exporting logs a second time in the example app — it used a single static `Completer`, so later exports immediately returned the first export's (possibly deleted) zip path and the `logsExported` handler threw `Bad state: Future already completed`. A new `Completer` is now created for each export
 * Fixed `type 'Null' is not a subtype of type 'String'` errors — every Dart method except `initLogs` now treats the native reply as nullable (`String?`)
